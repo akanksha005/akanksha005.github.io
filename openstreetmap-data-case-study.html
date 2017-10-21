@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+        <meta charset="utf-8" />
+        <title>OpenStreetMap Data Case Study</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Data Analytics-Akanksha Goel </a></h1>
+                <nav><ul>
+                    <li><a href="/category/data-analysis.html">Data Analysis</a></li>
+                    <li class="active"><a href="/category/data-wrangling.html">Data Wrangling</a></li>
+                    <li><a href="/category/machine-learning.html">Machine Learning</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/openstreetmap-data-case-study.html" rel="bookmark"
+           title="Permalink to OpenStreetMap Data Case Study">OpenStreetMap Data Case Study</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-07-19T08:10:00+05:30">
+                Published: Wed 19 July 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-wrangling.html">Data Wrangling</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>OpenStreetMap Data Case Study</h1>
+<h3>Map Area</h3>
+<h6>Melbourne,Australia (9,990.5 km2 )</h6>
+<ul>
+<li>https://www.openstreetmap.org/node/21579127#map=11/-37.8139/144.9632</li>
+<li>https://mapzen.com/data/metro-extracts/metro/melbourne_australia/</li>
+</ul>
+<p>Chose this city randomely having metro extract greater than 50 Mb</p>
+<h1>Problems Encountered in Map Area(sample.osm)</h1>
+<ul>
+<li>
+<p>Over­abbreviated street names (“<em>Intrepid Av</em>”)</p>
+</li>
+<li>
+<p>Inconsistency in the Postal Code ("<em>(3006;3130),3206Unset,38058</em>")</p>
+</li>
+<li>
+<p>“Incorrect” postal codes (Melbourne area zip codes all begin with “300” and postal codes must be 4 digit only however a large portion of all documented zip codes were outside this region.)  </p>
+</li>
+<li>
+<p>Most of the cities are not part of Melbourne but present on the outskirt of Melbourne.("<em>Caroline Springs is a suburb of Melbourne, Victoria, Australia, 25 km west of Melbourne's Central Business District.</em>")</p>
+</li>
+<li>
+<p>Typo Errors or City name Inconsistencies =&gt;Misspelled city("<em>Moridalloc =&gt; Moriadlloc</em> ")</p>
+</li>
+</ul>
+<h4>Over­abbreviated Street Names</h4>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xml.etree.cElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="n">OSMFILE</span> <span class="o">=</span> <span class="s2">&quot;sample.osm&quot;</span>
+<span class="n">street_type_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\b\S+\.?$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+
+<span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;St&quot;</span><span class="p">,</span><span class="s2">&quot;St.&quot;</span><span class="p">,</span><span class="s2">&quot;Rd.&quot;</span><span class="p">,</span><span class="s2">&quot;Av&quot;</span><span class="p">,</span><span class="s2">&quot;Gr&quot;</span><span class="p">,</span><span class="s1">&#39;Stg&#39;</span><span class="p">,</span><span class="s2">&quot;Rd&quot;</span><span class="p">]</span>
+
+<span class="n">cities</span> <span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+
+<span class="c1"># UPDATE THIS VARIABLE</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;St&quot;</span><span class="p">:</span> <span class="s2">&quot;Street&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;St.&quot;</span><span class="p">:</span> <span class="s2">&quot;Street&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Rd.&quot;</span><span class="p">:</span><span class="s2">&quot;Road&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Av&quot;</span><span class="p">:</span><span class="s2">&quot;Avenue&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;Gr&quot;</span><span class="p">:</span><span class="s1">&#39;Grove&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;Stg&#39;</span><span class="p">:</span><span class="s2">&quot;Street&quot;</span>
+            <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">audit_street_type</span><span class="p">(</span><span class="n">street_types</span><span class="p">,</span> <span class="n">street_name</span><span class="p">):</span>
+    <span class="n">abbr</span><span class="o">=</span><span class="bp">False</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">street_type_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">street_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">street_type</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">street_type</span> <span class="ow">in</span> <span class="n">expected</span><span class="p">:</span>
+            <span class="n">abbr</span><span class="o">=</span><span class="bp">True</span>
+            <span class="n">street_types</span><span class="p">[</span><span class="n">street_type</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">street_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">abbr</span>
+
+
+<span class="k">def</span> <span class="nf">is_street_name</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;addr:street&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">audit</span><span class="p">(</span><span class="n">osmfile</span><span class="p">):</span>
+    <span class="n">osm_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">osmfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">street_types</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">ET</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">osm_file</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,)):</span>
+
+        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span> <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;way&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s2">&quot;tag&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_street_name</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+
+                    <span class="n">abbr</span><span class="o">=</span><span class="n">audit_street_type</span><span class="p">(</span><span class="n">street_types</span><span class="p">,</span> <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">abbr</span><span class="p">):</span>
+                        <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">update_name</span><span class="p">(</span> <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">],</span> <span class="n">mapping</span><span class="p">)</span>
+
+    <span class="n">osm_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">street_types</span>
+
+<span class="k">def</span> <span class="nf">audit_city</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">osm_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> 
+    <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">cities</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">city_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">ET</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">osm_file</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,)):</span>
+        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span> <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;way&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s2">&quot;tag&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;addr:city&quot;</span><span class="p">:</span>
+                    <span class="n">cities</span><span class="o">=</span><span class="n">cities</span><span class="o">+</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;addr:city&quot;</span> <span class="ow">and</span> <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Melbourne&quot;</span><span class="p">:</span>
+                    <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">city_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span>
+    <span class="k">print</span> <span class="s2">&quot;Total number of cities: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cities</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s2">&quot;Total number of suburbs or Neighbouring areas: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">city_list</span>
+
+<span class="k">def</span> <span class="nf">update_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">street_type_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mapping</span><span class="p">)</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span><span class="o">==</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">():</span>
+           <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="n">name</span>
+
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="n">st_types</span> <span class="o">=</span> <span class="n">audit</span><span class="p">(</span><span class="n">OSMFILE</span><span class="p">)</span>
+    <span class="n">city_list</span> <span class="o">=</span> <span class="n">audit_city</span><span class="p">(</span><span class="n">OSMFILE</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">st_types</span><span class="p">))</span>
+<span class="c1">#     pprint.pprint(city_list)</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Few suburbs:&quot;</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">([[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">city_list</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span> <span class="p">)</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Misspelled City:&quot;</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">city_list</span> <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="o">==</span><span class="s2">&quot;Moridalloc&quot;</span><span class="p">)]</span> <span class="p">)</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> After Auditing Street Names:&quot;</span>
+    <span class="k">for</span> <span class="n">st_type</span><span class="p">,</span> <span class="n">ways</span> <span class="ow">in</span> <span class="n">st_types</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ways</span><span class="p">:</span>
+            <span class="n">better_name</span> <span class="o">=</span> <span class="n">update_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mapping</span><span class="p">)</span>
+            <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;=&gt;&quot;</span><span class="p">,</span> <span class="n">better_name</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Total number of cities: 7220
+Total number of suburbs or Neighbouring areas: 6762
+{&#39;Av&#39;: set([&#39;Intrepid Av&#39;]),
+ &#39;Gr&#39;: set([&#39;McCarthy Gr&#39;]),
+ &#39;St&#39;: set([&#39;Queen St&#39;]),
+ &#39;Stg&#39;: set([&#39;Leigh Stg&#39;])}
+
+ Few suburbs:
+[&#39;Caroline Springs&#39;,
+ &#39;North Warrandyte&#39;,
+ &#39;Geelong&#39;,
+ &#39;reservoir&#39;,
+ &#39;Rosebud West&#39;]
+
+ Misspelled City:
+[&#39;Moridalloc&#39;]
+
+ Auditing in Street Names:
+Intrepid Av =&gt; Intrepid Avenue
+Leigh Stg =&gt; Leigh Street
+McCarthy Gr =&gt; McCarthy Grove
+Queen St =&gt; Queen Street
+</pre></div>
+
+
+<h1>Suburbs near Melbourne</h1>
+<p>Most of the cities are few Kms distant from main city of Melbourne.The 90% of datset comprises of suburbs of Melbourne i.e. is the a separate residential community within commuting distance of a city of Melbourne.</p>
+<h1>Inconsistency in Postal Code</h1>
+<p>When auditing the postal code removed the unwanted text and found the sets to postal codes then took the first postal code more relavant to describe the city.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xml.etree.cElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="n">OSMFILE</span> <span class="o">=</span> <span class="s2">&quot;sample.osm&quot;</span>
+<span class="n">postal_type_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\b\S+\.?$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+<span class="n">zip_code_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\d{4}$&#39;</span><span class="p">)</span>
+<span class="n">fix_zipcode_state_short</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d{4};\d{4}$&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">audit_postal_type</span><span class="p">(</span><span class="n">postal_types</span><span class="p">,</span> <span class="n">postal_name</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">postal_type_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">postal_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">postal_type</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">postal_type</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">postal_type</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">:</span>
+            <span class="n">postal_types</span><span class="p">[</span><span class="n">postal_type</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">postal_name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">audit_zip_code</span><span class="p">(</span><span class="n">zip_code</span><span class="p">):</span>
+    <span class="n">change</span><span class="o">=</span><span class="bp">False</span>
+    <span class="n">new_code</span><span class="o">=</span><span class="n">zip_code</span>
+    <span class="n">zip_code</span> <span class="o">=</span> <span class="n">zip_code</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">zip_code_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">zip_code</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">zip_code</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Unset&#39;</span><span class="p">:</span>
+        <span class="n">change</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">new_code</span> <span class="o">=</span> <span class="n">zip_code</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">change</span><span class="p">,</span><span class="n">new_code</span><span class="p">,</span><span class="n">zip_code</span>
+    <span class="k">if</span> <span class="n">fix_zipcode_state_short</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">zip_code</span><span class="p">):</span>
+        <span class="n">change</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">new_code</span> <span class="o">=</span> <span class="n">zip_code</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">change</span><span class="p">,</span><span class="n">new_code</span><span class="p">,</span><span class="n">zip_code</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">change</span><span class="p">,</span><span class="n">new_code</span><span class="p">,</span><span class="n">zip_code</span>
+    <span class="k">if</span> <span class="n">zip_code</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span><span class="p">,</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="s2">&quot;none&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">change</span><span class="p">,</span><span class="n">new_code</span><span class="p">,</span><span class="n">zip_code</span>
+
+
+<span class="k">def</span> <span class="nf">is_postal_name</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;addr:postcode&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">audit</span><span class="p">(</span><span class="n">osmfile</span><span class="p">):</span>
+    <span class="n">osm_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">osmfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">postal_types</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s2">&quot;After Auditing:&quot;</span>
+    <span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">ET</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">osm_file</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,)):</span>
+
+        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span> <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;way&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s2">&quot;tag&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_postal_name</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+                    <span class="n">audit_postal_type</span><span class="p">(</span><span class="n">postal_types</span><span class="p">,</span> <span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span>
+                    <span class="n">c</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">code</span><span class="o">=</span><span class="n">audit_zip_code</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">c</span><span class="p">:</span>
+
+                        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span> <span class="o">+</span><span class="s2">&quot;=&gt;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">osm_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">postal_types</span>
+
+
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="n">postal_types</span> <span class="o">=</span> <span class="n">audit</span><span class="p">(</span><span class="n">OSMFILE</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">print</span> <span class="s2">&quot;Inconsistent Postal Codes:&quot;</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">postal_types</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>After Auditing:
+3206Unset=&gt;3206
+3006;3130=&gt;3006
+
+
+List of Inconsistent Postal Codes:
+{&#39;3006;3130&#39;: set([&#39;3006;3130&#39;]),
+ &#39;3206Unset&#39;: set([&#39;3206Unset&#39;]),
+ &#39;38058&#39;: set([&#39;38058&#39;])}
+</pre></div>
+
+
+<p>Now applying sql queries on smaller database from <em>sample1.osm</em> </p>
+<div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">tags</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">count</span> 
+<span class="n">FROM</span> <span class="p">(</span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">nodes_tags</span> 
+      <span class="n">UNION</span> <span class="n">ALL</span> 
+      <span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">ways_tags</span><span class="p">)</span> <span class="n">tags</span>
+<span class="n">WHERE</span> <span class="n">tags</span><span class="o">.</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;postcode&#39;</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">tags</span><span class="o">.</span><span class="n">value</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">count</span> <span class="n">DESC</span> <span class="n">lIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Here are the top ten results, beginning with the highest count:</p>
+<div class="highlight"><pre><span></span><span class="mi">3150</span><span class="p">,</span><span class="mi">213</span>
+<span class="mi">3195</span><span class="p">,</span><span class="mi">105</span>
+<span class="mi">3152</span><span class="p">,</span><span class="mi">81</span>
+<span class="mi">3805</span><span class="p">,</span><span class="mi">73</span>
+<span class="mi">3094</span><span class="p">,</span><span class="mi">37</span>
+<span class="mi">3149</span><span class="p">,</span><span class="mi">27</span>
+<span class="mi">3168</span><span class="p">,</span><span class="mi">26</span>
+<span class="mi">3196</span><span class="p">,</span><span class="mi">23</span>
+<span class="mi">3088</span><span class="p">,</span><span class="mi">21</span>
+<span class="mi">3170</span><span class="p">,</span><span class="mi">20</span>
+</pre></div>
+
+
+<p>considering these postal codes from sample1,I checked them on 
+https://postcodes-australia.com/
+and found that most of them or not even in melbourne.
+That struck me as surprisingly high to be a blatant error, and found that the number one postal code “3150” lie in Glen Waverley, SC. So, I performed another aggregation to verify a certain suspicion...</p>
+<h3>Sort cities by count, descending</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">tags</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">count</span> 
+<span class="n">FROM</span> <span class="p">(</span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">nodes_tags</span> <span class="n">UNION</span> <span class="n">ALL</span> 
+      <span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">ways_tags</span><span class="p">)</span> <span class="n">tags</span>
+<span class="n">WHERE</span> <span class="n">tags</span><span class="o">.</span><span class="n">key</span> <span class="n">LIKE</span> <span class="s1">&#39;</span><span class="si">%c</span><span class="s1">ity&#39;</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">tags</span><span class="o">.</span><span class="n">value</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">count</span> <span class="n">DESC</span>
+<span class="n">LMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+
+
+<p>And, the top 10 results were:</p>
+<div class="highlight"><pre><span></span><span class="n">Glen</span> <span class="n">Waverley</span><span class="o">|</span><span class="mi">129</span>
+<span class="n">Wheelers</span> <span class="n">Hill</span><span class="o">|</span><span class="mi">66</span>
+<span class="n">Wantirna</span> <span class="n">South</span><span class="o">|</span><span class="mi">62</span>
+<span class="n">Mount</span> <span class="n">Waverley</span><span class="o">|</span><span class="mi">39</span>
+<span class="n">Melbourne</span><span class="o">|</span><span class="mi">37</span>
+<span class="n">Montmorency</span><span class="o">|</span><span class="mi">37</span>
+<span class="n">Mulgrave</span><span class="o">|</span><span class="mi">20</span>
+<span class="n">Scoresby</span><span class="o">|</span><span class="mi">16</span>
+<span class="n">Vermont</span> <span class="n">South</span><span class="o">|</span><span class="mi">16</span>
+<span class="n">Clayton</span><span class="o">|</span><span class="mi">13</span>
+</pre></div>
+
+
+<p>These results confirmed my suspicion that this metro extract would perhaps be more aptly named “Metrolina” or the “Melbourne Metropolitan Area” for its inclusion of surrounding cities in the sprawl.</p>
+<h2>Data Overview and Additional Ideas</h2>
+<p>This section contains basic statistics about the dataset from <em>sample1.osm</em>, the sql queries used to gather them, and some additional ideas about the data in context.</p>
+<h3>File sizes</h3>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">hurry.filesize</span> <span class="kn">import</span> <span class="n">size</span>
+<span class="c1">#put your own path of folder for which size of file has to be computed</span>
+<span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;C:\Users\AKANKSHA\Desktop\udacity\openstreet project\sqlite_windows&#39;</span>
+
+<span class="n">files_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+    <span class="n">files_list</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="n">filename</span><span class="p">,</span> <span class="n">size</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))))</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">files_list</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;{:.&lt;40s}: {:5s}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">size</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nl">.DS_Store...............................:</span> <span class="err">6</span><span class="nf">K</span>   
+<span class="no">melbourne_australia.osm.................</span><span class="p">:</span> <span class="mi">818</span><span class="no">M</span> 
+<span class="no">nodes.csv...............................</span><span class="p">:</span> <span class="mi">3</span><span class="no">M</span>   
+<span class="no">nodes.db................................</span><span class="p">:</span> <span class="mi">2</span><span class="no">M</span>   
+<span class="no">nodes_tags.csv..........................</span><span class="p">:</span> <span class="mi">287</span><span class="no">K</span> 
+<span class="no">node_tags.db............................</span><span class="p">:</span> <span class="mi">305</span><span class="no">K</span> 
+<span class="no">sample.osm..............................</span><span class="p">:</span> <span class="mi">82</span><span class="no">M</span>  
+<span class="no">sample1.osm.............................</span><span class="p">:</span> <span class="mi">8</span><span class="no">M</span>   
+<span class="no">sqlite3.exe.............................</span><span class="p">:</span> <span class="mi">655</span><span class="no">K</span> 
+<span class="no">ways.csv................................</span><span class="p">:</span> <span class="mi">309</span><span class="no">K</span> 
+<span class="no">ways.db.................................</span><span class="p">:</span> <span class="mi">292</span><span class="no">K</span> 
+<span class="no">ways.db</span><span class="p">,</span><span class="no">nodes.db........................</span><span class="p">:</span> <span class="mi">0</span><span class="no">B</span>   
+<span class="no">ways.db</span><span class="p">,</span><span class="no">nodes.db</span><span class="c">;.......................: 0B   </span>
+<span class="no">ways_nodes.csv..........................</span><span class="p">:</span> <span class="mi">1</span><span class="no">M</span>   
+<span class="no">ways_tags.csv...........................</span><span class="p">:</span> <span class="mi">483</span><span class="no">K</span> 
+<span class="no">ways_tags.db............................</span><span class="p">:</span> <span class="mi">508</span><span class="no">K</span>
+</pre></div>
+
+
+<h3>Number of nodes(nodes.db)</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">nodes</span><span class="p">;</span>
+</pre></div>
+
+
+<p>38363</p>
+<h3>Number of ways(ways.db)</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">ways</span><span class="p">;</span>
+</pre></div>
+
+
+<p>5287</p>
+<h3>Number of unique users</h3>
+<p>Using Sql:</p>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">COUNT</span><span class="p">(</span><span class="n">DISTINCT</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">uid</span><span class="p">))</span>          
+<span class="n">FROM</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">uid</span> <span class="n">FROM</span> <span class="n">nodes</span> <span class="n">UNION</span> <span class="n">ALL</span> <span class="n">SELECT</span> <span class="n">uid</span> <span class="n">FROM</span> <span class="n">ways</span><span class="p">)</span> <span class="n">e</span><span class="p">;</span>
+</pre></div>
+
+
+<p>769</p>
+<h3>Top 10 contributing users</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">e</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num</span>
+<span class="n">FROM</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">user</span> <span class="n">FROM</span> <span class="n">nodes</span> <span class="n">UNION</span> <span class="n">ALL</span> <span class="n">SELECT</span> <span class="n">user</span> <span class="n">FROM</span> <span class="n">ways</span><span class="p">)</span> <span class="n">e</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">e</span><span class="o">.</span><span class="n">user</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">num</span> <span class="n">DESC</span>
+<span class="n">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">CloCkWeRX</span><span class="o">|</span><span class="mi">11871</span>
+<span class="n">Leon</span> <span class="n">K</span><span class="o">|</span><span class="mi">4539</span>
+<span class="n">melb_guy</span><span class="o">|</span><span class="mi">2883</span>
+<span class="n">Glen</span><span class="o">|</span><span class="mi">1844</span>
+<span class="n">AlexOnTheBus</span><span class="o">|</span><span class="mi">1346</span>
+<span class="n">stevage</span><span class="o">|</span><span class="mi">927</span>
+<span class="n">Canley</span><span class="o">|</span><span class="mi">873</span>
+<span class="n">dssis1</span><span class="o">|</span><span class="mi">781</span>
+<span class="n">Supt_of_Printing</span><span class="o">|</span><span class="mi">766</span>
+<span class="n">nickbarker</span><span class="o">|</span><span class="mi">744</span>
+</pre></div>
+
+
+<h3>Number of users appearing only once (having 1 post)</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> 
+<span class="n">FROM</span>
+    <span class="p">(</span><span class="n">SELECT</span> <span class="n">e</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num</span>
+     <span class="n">FROM</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">user</span> <span class="n">FROM</span> <span class="n">nodes</span> <span class="n">UNION</span> <span class="n">ALL</span> <span class="n">SELECT</span> <span class="n">user</span> <span class="n">FROM</span> <span class="n">ways</span><span class="p">)</span> <span class="n">e</span>
+     <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">e</span><span class="o">.</span><span class="n">user</span>
+     <span class="n">HAVING</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="n">u</span><span class="p">;</span>
+</pre></div>
+
+
+<p>314</p>
+<h2>Additional Data Exploration</h2>
+<h3>Top 10 appearing amenities</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">value</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num</span>
+<span class="n">FROM</span> <span class="n">node_tags</span>
+<span class="n">WHERE</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;amenity&#39;</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">value</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">num</span> <span class="n">DESC</span>
+<span class="n">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">bench</span><span class="p">,</span><span class="mi">20</span>
+<span class="n">cafe</span><span class="p">,</span><span class="mi">14</span>
+<span class="n">parking</span><span class="p">,</span><span class="mi">14</span>
+<span class="n">restaurant</span><span class="p">,</span><span class="mi">14</span>
+<span class="n">toilets</span><span class="p">,</span><span class="mi">12</span>
+<span class="n">waste_basket</span><span class="p">,</span><span class="mi">11</span>
+<span class="n">bbq</span><span class="p">,</span><span class="mi">9</span>
+<span class="n">pub</span><span class="p">,</span><span class="mi">9</span>
+<span class="n">drinking_water</span><span class="p">,</span><span class="mi">8</span>
+<span class="n">bicycle_parking</span><span class="p">,</span><span class="mi">7</span>
+</pre></div>
+
+
+<h3>Biggest religion (no surprise here)</h3>
+<div class="highlight"><pre><span></span><span class="n">sqlite</span><span class="o">&gt;</span> <span class="n">SELECT</span> <span class="n">nodes_tags</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num</span>
+<span class="n">FROM</span> <span class="n">nodes_tags</span> 
+    <span class="n">JOIN</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">DISTINCT</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">nodes_tags</span> <span class="n">WHERE</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;place_of_worship&#39;</span><span class="p">)</span> <span class="n">i</span>
+    <span class="n">ON</span> <span class="n">nodes_tags</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">id</span>
+<span class="n">WHERE</span> <span class="n">nodes_tags</span><span class="o">.</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;religion&#39;</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">nodes_tags</span><span class="o">.</span><span class="n">value</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">num</span> <span class="n">DESC</span>
+<span class="n">LIMIT</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">christian</span><span class="o">|</span><span class="mi">2</span>
+<span class="n">scientologist</span><span class="o">|</span><span class="mi">1</span>
+</pre></div>
+
+
+<h3>Most popular cuisines</h3>
+<div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">node_tags</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num</span>
+<span class="n">FROM</span> <span class="n">node_tags</span> 
+    <span class="n">JOIN</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">DISTINCT</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">node_tags</span> <span class="n">WHERE</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span> <span class="n">i</span>
+    <span class="n">ON</span> <span class="n">node_tags</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">id</span>
+<span class="n">WHERE</span> <span class="n">node_tags</span><span class="o">.</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;cuisine&#39;</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">node_tags</span><span class="o">.</span><span class="n">value</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">num</span> <span class="n">DESC</span><span class="p">;</span>
+
+<span class="n">Sushi_Bar</span><span class="o">|</span><span class="mi">1</span>
+<span class="n">chinese</span><span class="p">;</span><span class="n">vietnamese</span><span class="o">|</span><span class="mi">1</span>
+<span class="n">italian</span><span class="o">|</span><span class="mi">1</span>
+<span class="n">japanese</span><span class="p">;</span><span class="n">chinese</span><span class="o">|</span><span class="mi">1</span>
+</pre></div>
+
+
+<h3>Contributor statistics</h3>
+<p>The contributions of users seems incredibly skewed, possibly due to automated versus manual map editing (the word “bot” appears in some usernames). Here are some user percentage statistics:</p>
+<ul>
+<li>Top user contribution percentage (“CloCkWeRX”) 27.19%</li>
+<li>Combined top 2 users' contribution (“CloCkWeRX” and “Leon K”)37.5%</li>
+<li>Combined Top 10 users contribution 60.8%</li>
+<li>Combined number of users making up only 1% of posts(about 41% of all users)</li>
+</ul>
+<h2>Conclusion</h2>
+<p>The OpenStreetMap data of Melbourne is of fairly reasonable quality but the typo errors caused by the human inputs are
+significant as it can be seen in the Postal codes (<em>3206Unset</em>) and city names (<em>Moridalloc</em>). We have cleaned a significant amount of the data which is required for this project. But, there are lots of improvement needed in the dataset.This metro extract would perhaps be more aptly named “Metrolina” or the “Melbourne Metropolitan Area” for its inclusion of surrounding cities in the sprawl.This is proved by the cities and the postal codes of Neighbouring regions.The dataset contains very less amount of additional information such as amenities, tourist attractions, popular places and other useful interest.
+So, I think there are several opportunities for cleaning and validation of the data in the future.</p>
+<p>After this review of the data it’s obvious that the melbourne area is incomplete,though I believe it has been well cleaned for the purposes of this exercise. It interests me to notice a fair amount of GPS data makes it into OpenStreetMap.org on account of users’ efforts.</p>
+<h2>Additional Ideas</h2>
+<p><strong>Gamification: encouraging user participation through incentives</strong> </p>
+<ul>
+<li>Thinking about these user percentages, I’m reminded of “gamification” as a motivating force for contribution. In the context of the OpenStreetMap, if user data were more prominently displayed, perhaps others would take an initiative in submitting more edits to the map. And, if everyone sees that only a handful of power users are creating more than 90% a of given map, that might spur the creation of more efficient bots, especially if certain gamification elements were present, such as rewards, badges, or a leaderboard.</li>
+<li>They can keep competition where the person who found the problems and auditted the data appropriately will be provided prizez.(For Example: Kaggle where there are competitions for finding best results)</li>
+</ul>
+<p><strong>Clean Typo Errors </strong></p>
+<ul>
+<li>We can build parser which parse every word input by the users.</li>
+<li>We can make some rules or patterns to input data which users follow everytime to input their data. This will also restrict
+  users input in their native language.</li>
+<li>We can develope script or bot to clean the data regularly or certain period.</li>
+</ul>
+<p><strong>More Information from users</strong>
+<em> The tourists or even the city people search map to see the basic amenities provided in the city or what are the popular
+  places and attractions in the city or near outside the city. So, the users must be motivated to also provide these   informations in the map.Motivation can be incentives.
+</em> If we can provide these informations then there are more chances to increase views on the map because many people
+ directly enter the famous name on the map.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

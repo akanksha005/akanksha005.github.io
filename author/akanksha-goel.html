@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+        <meta charset="utf-8" />
+        <title>Data Analytics-Akanksha Goel - Akanksha Goel</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Data Analytics-Akanksha Goel </a></h1>
+                <nav><ul>
+                    <li><a href="/category/data-analysis.html">Data Analysis</a></li>
+                    <li><a href="/category/data-wrangling.html">Data Wrangling</a></li>
+                    <li><a href="/category/machine-learning.html">Machine Learning</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/enron-fraud-identification.html">Enron Fraud Identification</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-10-18T09:10:00+05:30">
+                Published: Wed 18 October 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/machine-learning.html">Machine Learning</a>.</p>
+
+</footer><!-- /.post-info --><h1>Identify Fraud From Enron Email Dataset</h1>
+<p>In 2000, Enron was one of the largest companies in the United States in energy trading and was named as 'America's most innovative company'. By 2002, it had collapsed into bankruptcy due to widespread corporate fraud. In the resulting Federal investigation, a significant amount of typically confidential information entered into the public record, including tens of thousands of emails and detailed financial data for top executives. In this project, i have applied my machine learning skills by building a person of interest identifier based on financial and email data made public as a result of the Enron scandal. To assist, we've combined this data with a hand-generated list of persons of interest in the fraud case, which means individuals who were indicted, reached a settlement or plea deal with the government, or testified in exchange for prosecution immunity.</p>
+<p>There are seven major steps in my project:
+1. Load the Dataset and Query the dataset.
+2. Outlier Detection and Removal
+3. Feature Pre-processing
+4. Classifier
+5. Comparison of different classifier
+6. Parameter Tuning
+7. Validation of Classifier</p>
+<h2>Load The Dataset</h2>
+<div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Starter code for exploring the Enron dataset (emails + finances);</span>
+<span class="sd">    loads up the dataset (pickled dict of dicts).</span>
+
+<span class="sd">    The dataset has the form:</span>
+<span class="sd">    enron_data[&quot;LASTNAME FIRSTNAME MIDDLEINITIAL&quot;] = { features_dict }</span>
+
+<span class="sd">    {features_dict} is a dictionary of features associated with that person.</span>
+<span class="sd">    and here&#39;s an example to get you started:</span>
+
+<span class="sd">    enron_data[&quot;SKILLING JEFFREY K&quot;][&quot;bonus&quot;] = 5600000</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="n">enron_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../final_project/final_project_dataset.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;There are &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">enron_data</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot; executives in Enron Dataset&quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>There are 146 executives in Enron Dataset
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">enron_data</span><span class="p">:</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">enron_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;poi&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+<span class="k">print</span> <span class="s2">&quot;There are &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Person of Interest(POI) and &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">enron_data</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="n">count</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot; Non-POIs  in our Dataset &quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>There are 18 Person of Interest(POI) and 128 Non-POIs  in our Dataset
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="s2">&quot;There are &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">enron_data</span><span class="p">[</span><span class="s2">&quot;SKILLING JEFFREY K&quot;</span><span class="p">]))</span><span class="o">+</span><span class="s2">&quot; features available for each person&quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>There are 21 features available for each person
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="s2">&quot;The 21 features are listed below:&quot;</span>
+<span class="n">k</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">features_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">enron_data</span><span class="p">[</span><span class="s2">&quot;SKILLING JEFFREY K&quot;</span><span class="p">]:</span>
+    <span class="k">print</span> <span class="s2">&quot;Feature &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;: &quot;</span><span class="o">+</span><span class="n">i</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">!=</span><span class="s1">&#39;poi&#39;</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">enron_data</span><span class="p">[</span><span class="s2">&quot;SKILLING JEFFREY K&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span><span class="o">==</span><span class="nb">int</span><span class="p">):</span>
+        <span class="n">features_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+<span class="k">print</span> <span class="s2">&quot;Features_list:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">features_list</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>The 21 features are listed below:
+Feature 1: salary
+Feature 2: to_messages
+Feature 3: deferral_payments
+Feature 4: total_payments
+Feature 5: exercised_stock_options
+Feature 6: bonus
+Feature 7: restricted_stock
+Feature 8: shared_receipt_with_poi
+Feature 9: restricted_stock_deferred
+Feature 10: total_stock_value
+Feature 11: expenses
+Feature 12: loan_advances
+Feature 13: from_messages
+Feature 14: other
+Feature 15: from_this_person_to_poi
+Feature 16: poi
+Feature 17: director_fees
+Feature 18: deferred_income
+Feature 19: long_term_incentive
+Feature 20: email_address
+Feature 21: from_poi_to_this_person
+Features_list:[&#39;poi&#39;, &#39;salary&#39;, &#39;to_messages&#39;, &#39;total_payments&#39;, &#39;exercised_stock_options&#39;, &#39;bonus&#39;, &#39;restricted_stock&#39;, &#39;shared_receipt_with_poi&#39;, &#39;total_stock_value&#39;, &#39;expenses&#39;, &#39;from_messages&#39;, &#39;other&#39;, &#39;from_this_person_to_poi&#39;, &#39;long_term_incentive&#39;, &#39;from_poi_to_this_person&#39;]
+</pre></div>
+
+
+<h1>Outlier Detection and Removal</h1>
+<p>Just going through the Enron Dataset,I found Outlier when Bonus of people were plotted against the salary of person.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../tools/&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">feature_format</span> <span class="kn">import</span> <span class="n">featureFormat</span><span class="p">,</span> <span class="n">targetFeatureSplit</span>
+
+
+<span class="c1">### read in data dictionary, convert to numpy array</span>
+<span class="n">data_dict</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../final_project/final_project_dataset.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="p">)</span>
+<span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;salary&quot;</span><span class="p">,</span> <span class="s2">&quot;bonus&quot;</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span><span class="n">remove_any_zeroes</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">salary</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bonus</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">salary</span><span class="p">,</span> <span class="n">bonus</span> <span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;salary&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;bonus&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_7_0.png"></p>
+<div class="highlight"><pre><span></span><span class="c1">#finding the point of outlier</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;bonus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">():</span>
+        <span class="k">print</span> <span class="n">key</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>TOTAL
+</pre></div>
+
+
+<p>As it can be seen "TOTAL" is irrelavant point.Therefor is removed and grapg is replotted below.</p>
+<div class="highlight"><pre><span></span><span class="n">data_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;TOTAL&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">salary</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bonus</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">salary</span><span class="p">,</span> <span class="n">bonus</span> <span class="p">)</span>
+
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;salary&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;bonus&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_10_0.png"></p>
+<div class="highlight"><pre><span></span><span class="c1">##other ouliers</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;salary&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;NaN&#39;</span><span class="p">:</span>
+        <span class="k">continue</span> 
+
+    <span class="n">outliers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">key</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+
+<span class="n">outliers_final</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">outliers</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">outliers_final</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[(&#39;SKILLING JEFFREY K&#39;, 1111258), (&#39;LAY KENNETH L&#39;, 1072321)]
+</pre></div>
+
+
+<p>These points cannot be removed from dataset as they are important people in Enron case and represent as the person of Interest(POI).</p>
+<h3>Linear Regression to predict Bonus from salary</h3>
+<p>Now,To predict the bonus of an Employee when only salary of a person is only given.Linear Regression is used.
+In regression, you need training and testing data, just like in classification.
+We will see how outlier affect the Regression.
+Outlier Detection and Removal is a process which comprise of:</p>
+<ol>
+<li>Train the dataset.</li>
+<li>Identify the outlier and remove the points with Residual Error.</li>
+<li>Re-Train the dataset.</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="c1">## Training the data</span>
+<span class="n">data_dict</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../final_project/final_project_dataset.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span><span class="n">remove_any_zeroes</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;salary&quot;</span><span class="p">,</span> <span class="s2">&quot;bonus&quot;</span><span class="p">]</span>
+<span class="n">target</span><span class="p">,</span> <span class="n">feature</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">feature_train</span><span class="p">,</span> <span class="n">feature_test</span><span class="p">,</span> <span class="n">target_train</span><span class="p">,</span> <span class="n">target_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span> <span class="k">as</span> <span class="n">lr</span>
+<span class="n">reg</span><span class="o">=</span><span class="n">lr</span><span class="p">()</span>
+<span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">feature_train</span><span class="p">,</span><span class="n">target_train</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">feature_test</span><span class="p">,</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">feature_test</span><span class="p">),</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span> <span class="p">)</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">print</span> <span class="n">reg</span><span class="o">.</span><span class="n">coef_</span>
+<span class="k">print</span> <span class="n">reg</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">feature_test</span> <span class="p">,</span> <span class="n">target_test</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">feature_test</span><span class="p">,</span> <span class="n">target_test</span><span class="p">):</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span> <span class="p">)</span> 
+<span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">feature_train</span><span class="p">,</span> <span class="n">target_train</span><span class="p">):</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span> <span class="p">)</span> 
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;salary&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;bonus&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[ 0.27229528]</span>
+<span class="na">-0.877354252073</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_14_1.png"></p>
+<div class="highlight"><pre><span></span><span class="c1">### Identification of outlier</span>
+<span class="c1">#!/usr/bin/python</span>
+
+
+<span class="n">data_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;TOTAL&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># data_dict.pop(&#39;LAVORATO JOHN J&#39;,0)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span><span class="n">remove_any_zeroes</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">target</span><span class="p">,</span> <span class="n">feature</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">feature_train</span><span class="p">,</span> <span class="n">feature_test</span><span class="p">,</span> <span class="n">target_train</span><span class="p">,</span> <span class="n">target_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span> <span class="k">as</span> <span class="n">lr</span>
+<span class="n">reg</span><span class="o">=</span><span class="n">lr</span><span class="p">()</span>
+<span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">feature_train</span><span class="p">,</span><span class="n">target_train</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">feature_test</span><span class="p">,</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">feature_test</span><span class="p">)</span> <span class="p">)</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">print</span> <span class="n">reg</span><span class="o">.</span><span class="n">coef_</span>
+<span class="k">print</span> <span class="n">reg</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">feature_test</span> <span class="p">,</span> <span class="n">target_test</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">feature_test</span><span class="p">,</span> <span class="n">target_test</span><span class="p">):</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span> <span class="p">)</span> 
+<span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">feature_train</span><span class="p">,</span> <span class="n">target_train</span><span class="p">):</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span> <span class="p">)</span> 
+
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;salary&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;bonus&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[ 0.03954061]</span>
+<span class="na">0.203020850473</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_15_1.png"></p>
+<p>It can be observed how outlier affects the result of Regression.There is drastic difference between regression score with  outlier and without outlier.Therefore outliers must be removed from dataset before any conclusions.</p>
+<h2>Feature Processing</h2>
+<h3>New Features</h3>
+<div class="highlight"><pre><span></span><span class="c1"># from sklearn.feature_selection import SelectKBest, f_classif</span>
+
+<span class="c1"># selector = SelectKBest(f_classif, k=10)</span>
+<span class="c1"># selector.fit(features_train, labels_train)</span>
+<span class="c1"># features_train_transformed = selector.transform(features_train).toarray()</span>
+<span class="c1"># features_test_transformed  = selector.transform(features_test).toarray()</span>
+
+<span class="c1">##New Features</span>
+<span class="k">def</span> <span class="nf">dict_to_list</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">normalizer</span><span class="p">):</span>
+    <span class="n">new_list</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;NaN&quot;</span> <span class="ow">or</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">normalizer</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;NaN&quot;</span><span class="p">:</span>
+            <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">])</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">normalizer</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">new_list</span>
+
+<span class="c1">### create two lists of new features</span>
+<span class="n">fraction_from_poi_email</span><span class="o">=</span><span class="n">dict_to_list</span><span class="p">(</span><span class="s2">&quot;from_poi_to_this_person&quot;</span><span class="p">,</span><span class="s2">&quot;to_messages&quot;</span><span class="p">)</span>
+<span class="n">fraction_to_poi_email</span><span class="o">=</span><span class="n">dict_to_list</span><span class="p">(</span><span class="s2">&quot;from_this_person_to_poi&quot;</span><span class="p">,</span><span class="s2">&quot;from_messages&quot;</span><span class="p">)</span>
+
+<span class="c1">### insert new features into data_dict</span>
+<span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+    <span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;fraction_from_poi_email&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">fraction_from_poi_email</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+    <span class="n">data_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;fraction_to_poi_email&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">fraction_to_poi_email</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+    <span class="n">count</span> <span class="o">+=</span><span class="mi">1</span>
+
+
+<span class="c1">### store to my_dataset for easy export below</span>
+<span class="n">my_dataset</span> <span class="o">=</span> <span class="n">data_dict</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+    <span class="n">Fraction_to</span><span class="o">=</span><span class="n">data_dict</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">]</span>
+    <span class="n">Fraction_From</span><span class="o">=</span><span class="n">data_dict</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;from_poi_to_this_person&#39;</span><span class="p">]</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;poi&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">):</span>
+       <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">Fraction_From</span><span class="p">,</span> <span class="n">Fraction_to</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">Fraction_From</span><span class="p">,</span> <span class="n">Fraction_to</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span> <span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;from_poi_to_this_person&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;from_this_person_to_poi&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_20_0.png"></p>
+<p>When I picked 'from_poi_to_this_person' and 'from_this_person_to_poi' but there is was no strong pattern
+when I plotted the data so I used fractions for both features of “from/to poi messages” and “total
+from/to messages”.</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+    <span class="n">Fraction_to</span><span class="o">=</span><span class="n">data_dict</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;fraction_to_poi_email&#39;</span><span class="p">]</span>
+    <span class="n">Fraction_From</span><span class="o">=</span><span class="n">data_dict</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;fraction_from_poi_email&#39;</span><span class="p">]</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;poi&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">):</span>
+       <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">Fraction_From</span><span class="p">,</span> <span class="n">Fraction_to</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span> <span class="n">Fraction_From</span><span class="p">,</span> <span class="n">Fraction_to</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span> <span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;fraction_from_poi_email&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;fraction_to_poi_email&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_22_0.png"></p>
+<p>Two new features were created and tested for this project. These were:
+● the fraction of all emails to a person that were sent from a person of interest;
+● the fraction of all emails that a person sent that were addressed to persons of interest.
+My assumption was that there is stronger connection between POI’s via email then that between POI’s
+and non-POI’s. When we look at scatterplot we can agree that the data pattern confirms said
+above, e.i. there is no POI below 0.2 in “x” axis.</p>
+<h2>Classification Algorithm for Enron Dataset</h2>
+<div class="highlight"><pre><span></span><span class="c1">##Naive Bayesian Classifier</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span><span class="n">features_list</span><span class="p">)</span>
+<span class="n">labels</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">features_train</span><span class="p">,</span><span class="n">features_test</span><span class="p">,</span><span class="n">labels_train</span><span class="p">,</span><span class="n">labels_test</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Naive Bayes Classifier:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;NB algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Naive Bayes Classifier:0.590909090909
+Precision: 0.5
+Recall: 0.222222222222
+NB algorithm time: 0.009 s
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1">##Decision Tree Classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+<span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span><span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span><span class="o">=</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">precision_score</span><span class="p">,</span><span class="n">recall_score</span>
+<span class="n">acc</span><span class="o">=</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Decision Tree Classifier: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;DT algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Decision Tree Classifier: 0.636363636364
+DT algorithm time: 0.007 s
+Precision: 0.25
+Recall: 0.166666666667
+</pre></div>
+
+
+<p>Now accuracy is not much therefore need of Feature selection to maximize the performance.As the number of features decrease to important features the 
+<em> Dataset is reduced.Less data with more information.
+</em> Less features Predict the label more accurately.</p>
+<h3>Feature Selection</h3>
+<p>feature importances :</p>
+<p>The feature importances. The higher, the more important the feature. The importance of a feature is computed as the (normalized) total reduction of the criterion brought by that feature. It is also known as the Gini importance.
+Now feature importance is calculated using decision tree</p>
+<div class="highlight"><pre><span></span><span class="nb">dict</span><span class="o">=</span><span class="p">{}</span>
+<span class="n">key</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">clf</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">:</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="n">features_list</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span><span class="o">=</span><span class="n">i</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">key_list</span><span class="o">=</span><span class="nb">sorted</span><span class="p">([</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span><span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">key_list</span>
+
+<span class="n">feature_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key_list</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">==</span><span class="n">key_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">and</span> <span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;poi&#39;</span><span class="ow">and</span> <span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;other&#39;</span> <span class="p">):</span>
+            <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="k">print</span> <span class="s2">&quot;New Feature List: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">feature_list</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[0.30664643327686802, 0.19287949921752737, 0.18550724637681168, 0.14814814814814811, 0.083333333333333315, 0.062652006313978229, 0.020833333333333329, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span>
+<span class="na">New Feature List: [&#39;poi&#39;, &#39;from_messages&#39;, &#39;total_payments&#39;, &#39;salary&#39;, &#39;total_stock_value&#39;, &#39;exercised_stock_options&#39;]</span>
+</pre></div>
+
+
+<p>Now using above features with high gini importance is chosen for getting optimal accuracy.</p>
+<div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">feature_list</span><span class="p">)</span>
+<span class="n">labels</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">features_train</span><span class="p">,</span><span class="n">features_test</span><span class="p">,</span><span class="n">labels_train</span><span class="p">,</span><span class="n">labels_test</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Naive Bayes Classifier:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;NB algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Naive Bayes Classifier:0.860465116279
+Precision: 0.2
+Recall: 0.333333333333
+NB algorithm time: 0.005 s
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span><span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span><span class="o">=</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">precision_score</span><span class="p">,</span><span class="n">recall_score</span>
+<span class="n">acc</span><span class="o">=</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Decision Tree Classifier: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;DT algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Decision Tree Classifier: 0.744186046512
+DT algorithm time: 0.002 s
+Precision: 0.2
+Recall: 0.125
+</pre></div>
+
+
+<p>Now checking the accuracy while introducing new features in the Features_list.</p>
+<div class="highlight"><pre><span></span><span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;fraction_to_poi_email&#39;</span><span class="p">)</span>
+<span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;fraction_from_poi_email&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">feature_list</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[&#39;poi&#39;, &#39;from_messages&#39;, &#39;total_payments&#39;, &#39;salary&#39;, &#39;total_stock_value&#39;, &#39;exercised_stock_options&#39;, &#39;fraction_to_poi_email&#39;, &#39;fraction_from_poi_email&#39;]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">feature_list</span><span class="p">)</span>
+<span class="n">labels</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">features_train</span><span class="p">,</span><span class="n">features_test</span><span class="p">,</span><span class="n">labels_train</span><span class="p">,</span><span class="n">labels_test</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span><span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span><span class="o">=</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">precision_score</span><span class="p">,</span><span class="n">recall_score</span>
+<span class="n">acc</span><span class="o">=</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Decision Tree Classifier: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;DT algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Decision Tree Classifier: 0.767441860465
+DT algorithm time: 0.001 s
+Precision: 0.4
+Recall: 0.222222222222
+</pre></div>
+
+
+<p>I see that the new features improved both precision and recall. Precision jumped from 0.20 to 0.40 and recall jumped from 0.125 to 0.222. So, this states that the new features improved performance and should probably be included in the final feature set.  When trying new subset of features by manually selecting different set of features as shown in below found the accuracy,precision and Recall increase significantly.</p>
+<h3>Manual Selection of features</h3>
+<p>Now manually selecting features having new features into consideration which increase the accuracy from 76 % to 92% and precision and recall from 0.4 t0 0.5 and 0.22 to 1 respectively.</p>
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">html</span>
+<span class="o">&lt;</span><span class="n">table</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Features</span> <span class="n">along</span> <span class="k">with</span> <span class="n">new</span> <span class="n">features</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Precision</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Recall</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Accuracy</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">stock</span> <span class="n">features</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.125</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">33</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.76</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">salary</span> <span class="n">features</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.25</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.66</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.78</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">Poi</span> <span class="n">related</span> <span class="n">features</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mi">1</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.92</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">table</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<table>
+<tr>
+<th>Features along with new features</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>Accuracy</th>
+</tr>
+<tr>
+<td>stock features</td>
+<td>0.125</td>
+<td>.33</td>
+<td>0.76</td>
+
+</tr>
+<tr>
+<td>salary features</td>
+<td>0.25</td>
+<td>0.66</td>
+<td>0.78</td>
+</tr>
+<tr>
+<td>Poi related features</td>
+<td>.5</td>
+<td>1</td>
+<td>0.92</td>
+</tr>
+</table>
+
+<p>Salary features with new features include :
+Features_list = ["poi", "fraction_from_poi_email", "fraction_to_poi_email", 'salary','bonus','long_term_incentive']</p>
+<p>Poi related features with new features include:
+Features_list = ["poi", "fraction_from_poi_email", "fraction_to_poi_email", 'shared_receipt_with_poi']</p>
+<p>Stock features with new features include:
+Features_list = ["poi", "fraction_from_poi_email", "fraction_to_poi_email", 'exercised_stock_options','total_stock_value']</p>
+<p>Now in the Table it can be seen that precision,recall and accuracy of new features with POI related features is
+increased considerably.Therefore used them as Final features list in the Decision Tree classifier.</p>
+<div class="highlight"><pre><span></span><span class="n">features_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;poi&quot;</span><span class="p">,</span> <span class="s2">&quot;fraction_from_poi_email&quot;</span><span class="p">,</span> <span class="s2">&quot;fraction_to_poi_email&quot;</span><span class="p">,</span> <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">]</span>
+<span class="c1"># features_list = [&quot;poi&quot;, &quot;fraction_from_poi_email&quot;, &quot;fraction_to_poi_email&quot;, &#39;exercised_stock_options&#39;,&#39;total_stock_value&#39;]</span>
+<span class="c1"># features_list = [&quot;poi&quot;, &quot;fraction_from_poi_email&quot;, &quot;fraction_to_poi_email&quot;, &#39;salary&#39;,&#39;bonus&#39;,&#39;long_term_incentive&#39;]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
+<span class="n">labels</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1">### use KFold for split and validate algorithm</span>
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="n">kf</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="ow">in</span> <span class="n">kf</span><span class="p">:</span>
+    <span class="c1">#make training and testing sets</span>
+    <span class="n">features_train</span><span class="o">=</span> <span class="p">[</span><span class="n">features</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">train_indices</span><span class="p">]</span>
+    <span class="n">features_test</span><span class="o">=</span> <span class="p">[</span><span class="n">features</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">test_indices</span><span class="p">]</span>
+    <span class="n">labels_train</span><span class="o">=</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">train_indices</span><span class="p">]</span>
+    <span class="n">labels_test</span><span class="o">=</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">test_indices</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">features_train</span><span class="p">,</span><span class="n">features_test</span><span class="p">,</span><span class="n">labels_train</span><span class="p">,</span><span class="n">labels_test</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span><span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span><span class="o">=</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">precision_score</span><span class="p">,</span><span class="n">recall_score</span>
+<span class="n">acc</span><span class="o">=</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Decision Tree Classifier: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;DT algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Accuracy when using Naive Bayes Classifier:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+<span class="k">print</span> <span class="s2">&quot;NB algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Decision Tree Classifier: 0.923076923077
+DT algorithm time: 0.379 s
+Precision: 0.5
+Recall: 1.0
+Accuracy when using Naive Bayes Classifier:0.807692307692
+Precision: 0.0
+Recall: 0.0
+NB algorithm time: 0.036 s
+</pre></div>
+
+
+<h3>Comparison of classifier</h3>
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">html</span>
+<span class="o">&lt;</span><span class="n">table</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Naive</span> <span class="n">Bayes</span> <span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Decision</span> <span class="n">Tree</span> <span class="n">Classifier</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">Precision</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">Recall</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mi">1</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">Accuracy</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.80</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.92</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">table</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<table>
+<tr>
+<th></th>
+<th>Naive Bayes </th>
+<th>Decision Tree Classifier</th>
+</tr>
+<tr>
+<td>Precision</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Recall</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tr>
+<tr>
+<td>Accuracy</td>
+<td>0.80</td>
+<td>0.92</td>
+</tr>
+</table>
+
+<h2>Parameter Tuning</h2>
+<p>Tuning is changing values of parameters present in the classifier to get optimal accuracy matrics
+and comparing them to get best classifier.</p>
+<p>In this dataset I cannot use accuracy for evaluating my algorithm because there a few POI’s in
+dataset and the best evaluator are precision and recall. There were only 18 examples of POIs in
+the dataset. There were 35 people who were POIs in “real life”, but for various reasons, half of
+those are not present in this dataset.Therefore kfold is used with the classifier.</p>
+<p>By manually setting the min_samples_split parameter in Decision Tree, Precision and Recall can be compared.
+Parameter min_samples_split are used to get best classifier.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dt_min_samples_split</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+    <span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">min_samples_split</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_train</span><span class="p">,</span><span class="n">labels_train</span><span class="p">)</span>
+    <span class="n">pred</span><span class="o">=</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_test</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">precision_score</span><span class="p">,</span><span class="n">recall_score</span>
+    <span class="n">acc</span><span class="o">=</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="s2">&quot;Accuracy when using Decision Tree Classifier: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s2">&quot;DT algorithm time:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;s&quot;</span>
+    <span class="k">print</span> <span class="s2">&quot;Precision: &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s2">&quot;Recall: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels_test</span><span class="p">))</span>
+
+<span class="n">dt_min_samples_split</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">dt_min_samples_split</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">dt_min_samples_split</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">dt_min_samples_split</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">dt_min_samples_split</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">dt_min_samples_split</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Accuracy when using Decision Tree Classifier: 0.884615384615
+DT algorithm time: 0.001 s
+Precision: 0.5
+Recall: 0.666666666667
+Accuracy when using Decision Tree Classifier: 0.923076923077
+DT algorithm time: 0.002 s
+Precision: 0.5
+Recall: 1.0
+Accuracy when using Decision Tree Classifier: 0.884615384615
+DT algorithm time: 0.001 s
+Precision: 0.5
+Recall: 0.666666666667
+Accuracy when using Decision Tree Classifier: 0.884615384615
+DT algorithm time: 0.002 s
+Precision: 0.5
+Recall: 0.666666666667
+Accuracy when using Decision Tree Classifier: 0.846153846154
+DT algorithm time: 0.002 s
+Precision: 0.75
+Recall: 0.5
+Accuracy when using Decision Tree Classifier: 0.769230769231
+DT algorithm time: 0.001 s
+Precision: 0.75
+Recall: 0.375
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">html</span>
+<span class="o">&lt;</span><span class="n">table</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Precision</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;</span><span class="n">Recall</span><span class="o">&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">min_sample_split</span><span class="o">=</span><span class="mi">2</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">66</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">min_sample_split</span><span class="o">=</span><span class="mi">3</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mi">1</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">min_sample_split</span><span class="o">=</span><span class="mi">5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">66</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">min_sample_split</span><span class="o">=</span><span class="mi">10</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">6</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">min_sample_split</span><span class="o">=</span><span class="mi">15</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.75</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">5</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">min_sample_split</span><span class="o">=</span><span class="mi">20</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mf">0.75</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;.</span><span class="mi">35</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">table</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<table>
+<tr>
+<th></th>
+<th>Precision</th>
+<th>Recall</th>
+</tr>
+<tr>
+<td>min_sample_split=2</td>
+<td>0.5</td>
+<td>.66</td>
+</tr>
+<tr>
+<td>min_sample_split=3</td>
+<td>0.5</td>
+<td>1</td>
+</tr>
+<tr>
+<td>min_sample_split=5</td>
+<td>.5</td>
+<td>.66</td>
+</tr>
+<tr>
+<td>min_sample_split=10</td>
+<td>0.5</td>
+<td>.6</td>
+</tr>
+<tr>
+<td>min_sample_split=15</td>
+<td>0.75</td>
+<td>.5</td>
+</tr>
+<tr>
+<td>min_sample_split=20</td>
+<td>0.75</td>
+<td>.35</td>
+</tr>
+</table>
+
+<p>One thing about the decision trees need to be mention, it might have a tendency in overfitting, since the min sample split is low.Because the size of the data set is limited (only 18 POIs), although the tester use cross validation, we cannot know for sure whether the data has been overfitted.</p>
+<p>It can be seen that with less tuning the value of precision and recall is less and as the parameter is tuned the accuracy metrics increases but if the parameter is overtuned the precision &amp; recall decreases. Therefore value of parameter has to be decided carefully.</p>
+<p>There is usually a trade off between precision and recall. An algorithm strong at one metric may be weak at the other metric. So when it comes to decide which algorithm is better, it come to how do we define risk. Is it more risky to flag out as a POI who is actually not or is it more risky to miss a true POI? That is in the eyes of the beholder.</p>
+<h2>Validation Of Classifier</h2>
+<h3>Using whole dataset for training and Testing</h3>
+<p>When there is no splitting of dataset into Training and Testing set i.e. same data is used for classification and prediction can be seen below:</p>
+<div class="highlight"><pre><span></span><span class="n">clf</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">pred</span><span class="o">=</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="n">acc</span><span class="o">=</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">acc</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1.0
+</pre></div>
+
+
+<p>Accuracy Score is increased to 1 but there are two problems when there is no splitting of dataset into Training and Testing data :
+<em> Performance of the algorithm cannot be compared.
+As it can be clearly seen in above results if whole dataset is used for classification and
+prediction Then the result will be biased. 
+The accuracy will be high but there is no sureity that the classifier can predict
+well for future inputs or not. To varify this targetdatasplit is done as for training the
+classifier on training set and predicting on Testing dataset.The accuracy is also measured 
+on Testing dataset to validate the classifier.
+</em> Overfitting of Data.
+In our case chances of overfitting are less as there are 18 POIs in 146 executives.Therefore need of <em>Kfold</em> method of cross validation so that classifier can be validated.</p>
+<h3>Using splitted dataset for Training and Testing</h3>
+<p>Therefore splitting the dataset into Training and testing dataset Performance can be easily 
+compared as shown above. The validation of the algorithm performance is conducted use the tester 
+function provided. The function uses cross validation with 1000 folds.As the 
+data related to POIs is very less i.e. 18 POIs from 146 executives.In this project, we are dealing with a small and imbalanced dataset.Working with smaller datasets is hard and in order to make validation models robust, we often go with k-fold cross-validation, which is what we do when we use a shuffle split.
+But well, in this project (and so many others we have in our day to day work), a stratified shuffle split is of choice. When dealing with small imbalanced datasets, it is possible that some folds contain almost none (or even none!) instances of the minority class. The idea behind stratification is to keep the percentage of the target class as close as possible to the one we have in the complete dataset.Therefore 3 fold cross
+validation is used above(<em>kfold cross validation</em>) and tester uses upto thousand folds(<em>stratifiedshufflesplit cross validation</em>) to validate the classifier
+on smaller dataset.</p>
+<p>Precision: precision is defined as the number true positive divided by the number of
+person labels as positive. A higher precision value means a person flag out as a POI is
+more likely to be a true POI. Recall: recall is defined as the number of true positive
+divided by the total number of positive. A higher recall value mean if a person is a POI,
+the algorithm is more likely to flag this person out.</p>
+<p>First I used accuracy to evaluate my algorithm. It was a mistake because in this case we have a
+class imbalance problem : the number of POIs is small compared to the total number of
+examples in the dataset. So I had to use precision and recall for these activities instead.
+I was able to reach average value of precision = 0.6, recall = 0.771.</p>
+<h1>Conclusion</h1>
+<p>Firstly I tried Naive Bayes accuracy was lower than with Decision Tree Algorithm (0.80 and 0.92
+respectively). I made a conclusion that that the feature set I used does not suit the distributional
+and interactive assumptions of Naive Bayes well.
+I selected Decision Tree Algorithm for the POI identifier. It gave me accuracy before tuning
+parameters = 0.88. No feature scaling was used, as it’s not necessary when using a decision
+tree.
+After selecting features and algorithm I manually tuned parameter min_samples_split.
+After using min_samples_split as 3 the Decision Tree gave maximum accuracy.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/openstreetmap-data-case-study.html" rel="bookmark"
+                           title="Permalink to OpenStreetMap Data Case Study">OpenStreetMap Data Case Study</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-07-19T08:10:00+05:30">
+                Published: Wed 19 July 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-wrangling.html">Data Wrangling</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>OpenStreetMap Data Case Study</h1>
+<h3>Map Area</h3>
+<h6>Melbourne,Australia (9,990.5 km2 )</h6>
+<ul>
+<li>https://www.openstreetmap.org/node/21579127#map=11/-37.8139/144.9632</li>
+<li>https://mapzen.com/data/metro-extracts/metro/melbourne_australia/</li>
+</ul>
+<p>Chose this city randomely having metro extract greater than 50 Mb</p>
+<h1>Problems Encountered in Map Area(sample.osm)</h1>
+<ul>
+<li>
+<p>Over …</p></li></ul>
+                <a class="readmore" href="/openstreetmap-data-case-study.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/csv-in-python.html" rel="bookmark"
+                           title="Permalink to Csv in Python">Csv in Python</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-06-03T01:20:00+05:30">
+                Published: Sat 03 June 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-analysis.html">Data Analysis</a>.</p>
+
+</footer><!-- /.post-info -->                <h2>Load Data from CSVs</h2>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">daily_engagement</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;daily_engagement_full.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">daily_engagement</span><span class="p">[</span><span class="s1">&#39;acct&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1237
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">unicodecsv</span>
+
+<span class="c1">## Longer version of code (replaced with shorter, equivalent version below)</span>
+
+<span class="c1"># enrollments = []</span>
+<span class="c1"># f = open(&#39;enrollments.csv&#39;, &#39;rb&#39;)</span>
+<span class="c1"># reader = unicodecsv.DictReader(f)</span>
+<span class="c1"># for row in reader:</span>
+<span class="c1">#     enrollments.append(row)</span>
+<span class="c1"># f.close()</span>
+<span class="k">def …</span></pre></div>
+                <a class="readmore" href="/csv-in-python.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/titanic-dataset.html" rel="bookmark"
+                           title="Permalink to Titanic Dataset">Titanic Dataset</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-03T10:20:00+05:30">
+                Published: Wed 03 May 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-analysis.html">Data Analysis</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Titanic Dataset</h1>
+<h3>Question</h3>
+<ul>
+<li>How different variables are dependent on no of people survived ?</li>
+<li>What is the highest age who has survived?</li>
+<li>How many males and females survived from this accident?</li>
+<li>what is the percentage of people survived?</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="c1">#Now fetching the titanic data using pandas </span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">titanic_data</span><span class="o">=</span><span class="n">pd …</span></pre></div>
+                <a class="readmore" href="/titanic-dataset.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

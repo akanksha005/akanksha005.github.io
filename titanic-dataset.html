@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+        <meta charset="utf-8" />
+        <title>Titanic Dataset</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Data Analytics-Akanksha Goel </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/data-analysis.html">Data Analysis</a></li>
+                    <li><a href="/category/data-wrangling.html">Data Wrangling</a></li>
+                    <li><a href="/category/machine-learning.html">Machine Learning</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/titanic-dataset.html" rel="bookmark"
+           title="Permalink to Titanic Dataset">Titanic Dataset</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-03T10:20:00+05:30">
+                Published: Wed 03 May 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-analysis.html">Data Analysis</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Titanic Dataset</h1>
+<h3>Question</h3>
+<ul>
+<li>How different variables are dependent on no of people survived ?</li>
+<li>What is the highest age who has survived?</li>
+<li>How many males and females survived from this accident?</li>
+<li>what is the percentage of people survived?</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="c1">#Now fetching the titanic data using pandas </span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">titanic_data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;titanic-data.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">Total_people_survived</span><span class="o">=</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">Total_people_survived</span>
+<span class="n">total_size</span><span class="o">=</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">total_size</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">]</span>
+<span class="n">percentage_of_people_survived</span> <span class="o">=</span> <span class="p">((</span><span class="n">Total_people_survived</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">total_size</span><span class="p">))[</span><span class="s1">&#39;Survived&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span>
+<span class="k">print</span> <span class="n">percentage_of_people_survived</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>342
+891
+38.3838383838
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+<span class="k">def</span> <span class="nf">relation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">people_survived</span><span class="o">=</span> <span class="n">titanic_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Relation between &quot;</span><span class="o">+</span><span class="n">x</span><span class="o">+</span><span class="s2">&quot; and people &quot;</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">people_survived</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">std_x</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">/</span><span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="n">std_y</span><span class="o">=</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">std_x</span><span class="o">*</span><span class="n">std_y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">relation</span><span class="p">(</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span><span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
+<span class="n">correlation</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Pclass&#39;</span><span class="p">],</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[&lt;matplotlib.lines.Line2D object at 0x00000000094FE208&gt;]</span>
+
+
+
+
+
+<span class="na">-0.33810114703176608</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_6_2.png"></p>
+<h4>Conclusion 1</h4>
+<ul>
+<li>It can be seen that the high class people were the ones who survived. High class people are the one who were rescued first.</li>
+<li>It can be seen from correlation being negative that as class goes from 1st to third class the survivors decrease.</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+<span class="c1"># people_survived=titanic_data[&#39;Age&#39;]</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;Sex&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Survived&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Pclass&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">titanic_data</span><span class="p">);</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_8_0.png"></p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sexs</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">string</span><span class="o">==</span><span class="s1">&#39;male&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+<span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">sexs</span><span class="p">)</span>
+<span class="n">relation</span><span class="p">(</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span><span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
+<span class="n">correlation</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">],</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[&lt;matplotlib.lines.Line2D object at 0x000000000B98C940&gt;]</span>
+
+
+
+
+
+<span class="na">0.54274155868170826</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_9_2.png"></p>
+<div class="highlight"><pre><span></span><span class="n">max_females_survived</span><span class="o">=</span> <span class="n">titanic_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Survived&#39;</span><span class="p">,</span><span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">max_females_survived</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">total_males_survived</span><span class="o">=</span><span class="n">Total_people_survived</span><span class="o">-</span><span class="n">max_females_survived</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="k">print</span> <span class="n">total_males_survived</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>   Survived  Sex
+1         1  233
+   Survived  Sex
+1       341  109
+</pre></div>
+
+
+<p>Here 0 on X axis refers to male population
+     1 on X axis refers to female population</p>
+<h4>Conclusion 2</h4>
+<ul>
+<li>
+<p>This can be seen in the graph that females were rescued first.</p>
+</li>
+<li>
+<p>positive Correlation also proves the above relation.</p>
+</li>
+<li>
+<p>342 people survived from the accident.</p>
+</li>
+<li>
+<p>233 females and 109 males survived from the incident.</p>
+</li>
+<li>
+<p>38 percent people survived from the tragedy.</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">correlation</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">],</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>-0.077884306616092594
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">max_age_of_people_survived</span><span class="o">=</span> <span class="n">titanic_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Survived&#39;</span><span class="p">,</span><span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)[</span><span class="s1">&#39;Age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="n">max_age_of_people_survived</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>   Survived       Age
+0         0  (70, 80]
+1         1  (70, 80]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">70</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+<span class="k">def</span> <span class="nf">relation_age</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">people_survived</span><span class="o">=</span> <span class="n">titanic_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Relation between different age groups and Survivors&#39;</span><span class="p">)</span>
+    <span class="n">people_survived</span><span class="o">=</span><span class="n">people_survived</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">people_survived</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">print</span> <span class="n">people_survived</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+    <span class="k">print</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">people_survived</span><span class="p">[</span><span class="n">y</span><span class="p">])</span>
+<span class="n">relation_age</span><span class="p">(</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span><span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0      (1, 10]
+1     (10, 20]
+2     (20, 30]
+3     (30, 40]
+4     (40, 50]
+5     (50, 60]
+6     (60, 70]
+7     (70, 80]
+8     (80, 90]
+9    (90, 100]
+Name: Age, dtype: category
+Categories (10, object): [(1, 10] &lt; (10, 20] &lt; (20, 30] &lt; (30, 40] ... (60, 70] &lt; (70, 80] &lt; (80, 90] &lt; (90, 100]]
+[&lt;matplotlib.lines.Line2D object at 0x000000000947DDA0&gt;]
+</pre></div>
+
+
+<p><img alt="png" src="output_16_1.png"></p>
+<h4>Conclusion 3</h4>
+<ul>
+<li>Younger age group people (20-30)yrs tend to survive from the accident more than the smaller children and people of older age.</li>
+<li>From negative correlation it can be seen as age increase tendency to survive decrease.</li>
+<li>Maximum age of person survived is 80 Yrs</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">relation</span><span class="p">(</span><span class="s1">&#39;SibSp&#39;</span><span class="p">,</span><span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
+<span class="n">correlation</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;SibSp&#39;</span><span class="p">],</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[&lt;matplotlib.lines.Line2D object at 0x000000000CFC16D8&gt;]</span>
+
+
+
+
+
+<span class="na">-0.035282855228175827</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_18_2.png"></p>
+<h4>Conclusion 4</h4>
+<ul>
+<li>Less siblings tendency to survival increases.</li>
+<li>negative correlation proves the above statement as well.</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">relation</span><span class="p">(</span><span class="s1">&#39;Embarked&#39;</span><span class="p">,</span><span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x000000000C00B828&gt;]
+</pre></div>
+
+
+<p><img alt="png" src="output_20_1.png"></p>
+<p>0    C
+1    Q
+2    S
+Name: Embarked, dtype: object</p>
+<div class="highlight"><pre><span></span><span class="n">relation</span><span class="p">(</span><span class="s1">&#39;Parch&#39;</span><span class="p">,</span><span class="s1">&#39;Survived&#39;</span><span class="p">)</span>
+<span class="n">correlation</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Parch&#39;</span><span class="p">],</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">[&lt;matplotlib.lines.Line2D object at 0x000000000C53B358&gt;]</span>
+
+
+
+
+
+<span class="na">0.081537791587317957</span>
+</pre></div>
+
+
+<p><img alt="png" src="output_22_2.png"></p>
+<p>There is not much relation seen in this case.</p>
+<h3>References</h3>
+<ul>
+<li>https://pandas.pydata.org/pandas-docs/stable/generated/pandas.cut.html</li>
+<li>https://stackoverflow.com/questions/17841149/pandas-groupby-how-to-get-a-union-of-strings</li>
+<li>https://classroom.udacity.com/nanodegrees/nd002/parts/0021345403/modules/317671873575460/lessons/5430778793/concepts/53961386540923</li>
+<li>https://matplotlib.org/api/pyplot_api.html</li>
+</ul>
+<h3>Limitation</h3>
+<ul>
+<li>The difference between the sample and the population, we don't know how the sample was chosen from the actual population of people that were on the Titanic. There could have been some sort of intentional or unintentional bias in how the sample was selected.</li>
+</ul>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
