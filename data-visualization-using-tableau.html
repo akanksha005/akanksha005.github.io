@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+        <meta charset="utf-8" />
+        <title>Data Visualization using Tableau</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Data Analytics-Akanksha Goel </a></h1>
+                <nav><ul>
+                    <li><a href="/category/data-analysis.html">Data Analysis</a></li>
+                    <li class="active"><a href="/category/data-visualization.html">Data Visualization</a></li>
+                    <li><a href="/category/data-wrangling.html">Data Wrangling</a></li>
+                    <li><a href="/category/machine-learning.html">Machine Learning</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/data-visualization-using-tableau.html" rel="bookmark"
+           title="Permalink to Data Visualization using Tableau">Data Visualization using Tableau</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-03T10:20:00+05:30">
+                Published: Fri 03 December 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-visualization.html">Data Visualization</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Titanic Data Visualization with Tableau-Akanksha Goel</h1>
+<h3>Tableau links</h3>
+<p>Before Feedback-
+https://public.tableau.com/profile/akanksha005#!/vizhome/TitanicDataVisualisation/Story1
+After Feedback-
+https://public.tableau.com/profile/akanksha005#!/vizhome/TitanicDatasetVisualisationafter_feedback/Story1?publish=yes</p>
+<h3>Summary</h3>
+<p>The largest passenger liner in service at the time, Titanic had an estimated 2,224 people on board when she struck an iceberg at around 23:40 on Sunday, 14 April 1912.
+On Monday, 15 April resulted in the deaths of more than 1,500 people, which made it one of the deadliest peacetime maritime disasters in history.
+In this provided visualization, we’re going to see how several factors affect the survival rate of passengers.First we see which cabin was firstly evacuated and more people were saved. Then we take ticket class which will be our main study factor. Then we will add passengers’ sex and port of Embarkation to the ticket class to see the effect on the survival rate. We will also see how number of dependents and age groups affect the probability of survival.</p>
+<h3>Design</h3>
+<p>The whole story use:
+1. Bar Graphs -In every bar chat, the y-axis shows the count of passengers, and the labels on top of the bars show the percentage or number of pessengers of the same single bar.As the whole story is focused on the people who survived or died from the accident,Bar charts easily help to see the count of people for particular category.It is easy to compare different categories of a variable.
+2. Line Plots-Line plots are used for Quantitative continuous variables, which helps in finding the relationship between two variables.</p>
+<p>Throughout the visualization, only three colors were used: Blue, orange, and Dark red gradient. 
+Reasoning: This will help keep a consistent color encoding to make it easier to read the plots. </p>
+<h3>Feedback</h3>
+<p>The initial version of the visualization was shared with two co-workers. Below is the received feedback and the changes that I made based on the discussions we’ve had: 
+<em> In the cabin group vs (Dead vs Survivors) visualization the relation between cabin group and the number of survivors is bit unclear.Therefore made the required changes in the latest visualization.
+</em> In the Port of Embarkation visualization the comparison between the number of people dead and survived cannot be seen properly.Therefore I changed the axis to vertically compare the number of survivors and perished people and added a lable telling the count of people dead and survived respectively.
+<em> In the age group visualization the number of people in significant age group is not considered which may affect the complete observation. Therefore to consider i took average number of survivors on Y axis.
+</em> In the second last visualization,don't understand how the percentile of survived can be 100% when there are 1 sibling.Therefore in reply replaced labels with actual probability of survival.</p>
+<h3>Resouces</h3>
+<p>The  Titanic dataset can be downloaded from <a href="https://docs.google.com/document/d/1w7KhqotVi5eoKE3I_AZHbsxdr-NmcWsLTIiZrpxWx4w/pub?embedded=true">Dataset Options</a></p>
+<p>Description
+Data Dictionary
+    Variable    Definition  Key
+    survival     Survival   0 = No, 1 = Yes
+    pclass     Ticket class 1 = 1st, 2 = 2nd, 3 = 3rd
+    sex         Sex 
+    Age        Age in years 
+    sibsp      # of siblings / spouses aboard the Titanic <br>
+    parch      # of parents / children aboard the Titanic <br>
+    ticket     Ticket number  <br>
+    fare       Passenger fare <br>
+    cabin      Cabin number 
+    embarked    Port of Embarkation C = Cherbourg, Q = Queenstown, S = Southampton</p>
+<div class="highlight"><pre><span></span>Variable    Notes
+pclass:     A proxy for socio-economic status (SES)
+1st = Upper
+2nd = Middle
+3rd = Lower
+
+age: Age is fractional if less than 1. If the age is estimated, is it in the form of xx.5
+
+sibsp: The dataset defines family relations in this way...
+Sibling = brother, sister, stepbrother, stepsister
+</pre></div>
+
+
+<h3>Cleaning the dataset</h3>
+<ul>
+<li>Filling the missing values of age with the mean of the age.</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="c1">#cleaning the dataset</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">Titanic_data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;titanic-data.csv&#39;</span><span class="p">)</span>   
+<span class="n">Mean_age</span><span class="o">=</span><span class="n">Titanic_data</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">Titanic_data</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">Titanic_data</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">Mean_age</span><span class="p">)</span>
+<span class="c1"># print Titanic_data</span>
+<span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Titanic_data</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PassengerId&#39;</span><span class="p">,</span> <span class="s1">&#39;Survived&#39;</span><span class="p">,</span> <span class="s1">&#39;Pclass&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;SibSp&#39;</span><span class="p">,</span> <span class="s1">&#39;Parch&#39;</span><span class="p">,</span> <span class="s1">&#39;Ticket&#39;</span><span class="p">,</span> <span class="s1">&#39;Fare&#39;</span><span class="p">,</span> <span class="s1">&#39;Cabin&#39;</span><span class="p">,</span> <span class="s1">&#39;Embarked&#39;</span><span class="p">])</span>
+<span class="c1"># df.to_csv(&#39;titanic-data.csv&#39;, sep=&#39;,&#39;, encoding=&#39;utf-8&#39;)</span>
+
+
+<span class="k">print</span> <span class="n">Titanic_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>   Unnamed: 0  PassengerId  Survived  Pclass  \
+0           0            1         0       3   
+1           1            2         1       1   
+2           2            3         1       3   
+3           3            4         1       1   
+4           4            5         0       3
+
+                                                Name     Sex   Age  SibSp  \
+0                            Braund, Mr. Owen Harris    male  22.0      1   
+1  Cumings, Mrs. John Bradley (Florence Briggs Th...  female  38.0      1   
+2                             Heikkinen, Miss. Laina  female  26.0      0   
+3       Futrelle, Mrs. Jacques Heath (Lily May Peel)  female  35.0      1   
+4                           Allen, Mr. William Henry    male  35.0      0
+
+   Parch            Ticket     Fare Cabin Embarked  
+0      0         A/5 21171   7.2500   NaN        S  
+1      0          PC 17599  71.2833   C85        C  
+2      0  STON/O2. 3101282   7.9250   NaN        S  
+3      0            113803  53.1000  C123        S  
+4      0            373450   8.0500   NaN        S
+</pre></div>
+
+
+<ul>
+<li>
+<p>Grouping the age in bins of 10 yrs.</p>
+</li>
+<li>
+<p>Dropping features that were not adding value to the purpose of the 
+  needed analysis such as: 'Ticket', 'Fare', 'Name', 'Pessenger ID'</p>
+</li>
+<li>
+<p>Grouping the Cabin into ['A','B','C','D','E','F','other'] by using the starting Alphabet of cabin person belong to.</p>
+</li>
+</ul>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
