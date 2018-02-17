@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="english">
+<head>
+        <meta charset="utf-8" />
+        <title>Youtube video comments Analysis</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Data Analytics-Akanksha Goel </a></h1>
+                <nav><ul>
+                    <li><a href="/category/data-analysis.html">Data Analysis</a></li>
+                    <li class="active"><a href="/category/data-visualization.html">Data Visualization</a></li>
+                    <li><a href="/category/data-wrangling.html">Data Wrangling</a></li>
+                    <li><a href="/category/machine-learning.html">Machine Learning</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/youtube-vedio-comments-analysis.html" rel="bookmark"
+           title="Permalink to Youtube vedio comments Analysis">Youtube video comments Analysis</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-02-16T10:20:00+05:30">
+                Published: Fri 16 February 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
+        </address>
+<p>In <a href="/category/data-visualization.html">Data Visualization</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Analysing Youtube Video comments(Assignment) By-Akanksha Goel</h1>
+<h2>Dataset</h2>
+<p>Comments of video ----&gt;https://www.youtube.com/watch?v=6ht4W7ZRd6Q</p>
+<p>Dataset --&gt;https://drive.google.com/file/d/17994Z3mCYci2HxDxzqhPAiquNB98YvLk/view?usp=sharing</p>
+<h2>Visualizations using Dataset created</h2>
+<p>Word Cloud ----&gt; https://public.tableau.com/profile/akanksha005#!/vizhome/Word_cloud/Sheet1?publish=yes</p>
+<p>Comments_Analysis -----&gt; https://public.tableau.com/profile/akanksha005#!/vizhome/Youtube_vedioComment_Analysis/Story1?publish=yes</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span> 
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span> <span class="k">as</span> <span class="n">df</span>
+<span class="k">def</span> <span class="nf">thai_to_english</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+
+    <span class="kn">from</span> <span class="nn">googletrans</span> <span class="kn">import</span> <span class="n">Translator</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="n">Translator</span><span class="p">()</span>
+    <span class="n">g</span><span class="o">=</span><span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">text</span>
+
+<span class="k">def</span> <span class="nf">parse_file</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">&#39;commentText&#39;</span><span class="p">]):</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s1">&#39;commentText&#39;</span><span class="p">])</span>
+
+
+    <span class="k">return</span> <span class="n">data</span>
+<span class="c1">#reading csv file</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">comments</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;comments.csv&quot;</span><span class="p">)</span>
+<span class="n">comments</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="c1"># d=parse_file(&quot;comments.csv&quot;)</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>user</th>
+      <th>date</th>
+      <th>timestamp</th>
+      <th>commentText</th>
+      <th>likes</th>
+      <th>hasReplies</th>
+      <th>numberOfReplies</th>
+      <th>replies.id</th>
+      <th>replies.user</th>
+      <th>replies.date</th>
+      <th>replies.timestamp</th>
+      <th>replies.commentText</th>
+      <th>replies.likes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>UgznqJVDAVFTEEOYXnZ4AaABAg</td>
+      <td>My Mate Nate</td>
+      <td>2 months ago</td>
+      <td>1.510000e+12</td>
+      <td>ใครว่า ตั้งกับนัทเหมือนมาก 555!! \nอย่าลืมกดติ...</td>
+      <td>1326.0</td>
+      <td>True</td>
+      <td>115.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>UgznqJVDAVFTEEOYXnZ4AaABAg.8_uJZFCXAv08_uk3ihyexb</td>
+      <td>MR.chanathip channel</td>
+      <td>2 months ago</td>
+      <td>1.510000e+12</td>
+      <td>My Mate Nate คนแรกครับ</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>UgznqJVDAVFTEEOYXnZ4AaABAg.8_uJZFCXAv08_uk43FL0bG</td>
+      <td>มายด์มิ้นส์ โสดเต็ม100</td>
+      <td>2 months ago</td>
+      <td>1.510000e+12</td>
+      <td>ค่ะ</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>UgznqJVDAVFTEEOYXnZ4AaABAg.8_uJZFCXAv08_uk5e8fKQS</td>
+      <td>สุธิดา อึ้งสุวรรณสกุล</td>
+      <td>2 months ago</td>
+      <td>1.510000e+12</td>
+      <td>My Mate Nate สวัสดีคะในข้อสอบหนูมีชื่อพี่ด้วยนะคะ</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>UgznqJVDAVFTEEOYXnZ4AaABAg.8_uJZFCXAv08_uk84hT0zg</td>
+      <td>สุธิดา อึ้งสุวรรณสกุล</td>
+      <td>2 months ago</td>
+      <td>1.510000e+12</td>
+      <td>เม้นแรก แจกของ สวัสดีคะ</td>
+      <td>4.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1">#coverting thai language to english language</span>
+<span class="n">d</span><span class="o">=</span><span class="n">comments</span><span class="p">[</span><span class="s1">&#39;commentText&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">eng</span><span class="o">=</span><span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">r</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">g</span><span class="o">=</span><span class="n">thai_to_english</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">eng</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">continue</span> 
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">counter</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">eng</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">counter</span><span class="o">==</span><span class="mi">10</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="k">print</span> <span class="n">g</span>
+    <span class="n">counter</span><span class="o">+=</span><span class="mi">1</span> 
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">sent_tokenize</span><span class="p">,</span> <span class="n">word_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.stem</span> <span class="kn">import</span> <span class="n">PorterStemmer</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">eng</span><span class="p">:</span>
+    <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">g</span>
+
+
+<span class="n">ps</span> <span class="o">=</span> <span class="n">PorterStemmer</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+
+<span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
+
+<span class="n">word_tokens</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="n">filtered_sentence</span> <span class="o">=</span> <span class="p">[</span><span class="n">ps</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_tokens</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">]</span> <span class="c1"># removing useless words</span>
+
+<span class="n">filtered_sentence</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_tokens</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">w</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">:</span>
+        <span class="n">filtered_sentence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="c1"># print filtered_sentence</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1">#classifying comment as positive neutral or negative</span>
+<span class="kn">from</span> <span class="nn">nltk.sentiment.vader</span> <span class="kn">import</span> <span class="n">SentimentIntensityAnalyzer</span>
+<span class="n">sid</span> <span class="o">=</span> <span class="n">SentimentIntensityAnalyzer</span><span class="p">()</span>
+<span class="n">file_d</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">eng</span><span class="p">:</span>
+    <span class="n">line</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">sentence</span>
+    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">sid</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ss</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span>
+            <span class="n">line</span><span class="p">[</span><span class="s1">&#39;positivity&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">&gt;</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">):</span>
+                <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;positive&#39;</span>
+
+        <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;neg&#39;</span><span class="p">:</span>
+            <span class="n">line</span><span class="p">[</span><span class="s1">&#39;negativity&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">&gt;</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">):</span>
+                <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;negative&#39;</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;neu&#39;</span><span class="p">:</span>
+            <span class="n">line</span><span class="p">[</span><span class="s1">&#39;neutrality&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">&gt;</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">):</span>
+                <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;neutral&#39;</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;neutral&#39;</span>
+    <span class="n">file_d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="c1">#saving in dictionary</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1">#creating Word_file dictionary containg all important words</span>
+<span class="n">word_file</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">filtered_sentence</span><span class="p">:</span>
+    <span class="n">line</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;word&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">word</span>
+    <span class="n">word_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<span class="c1"># print word_file</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1">#write in file</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="k">def</span> <span class="nf">WriteDictToCSV</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span><span class="n">csv_columns</span><span class="p">,</span><span class="n">dict_data</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">csv_columns</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dict_data</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+    <span class="k">return</span> 
+<span class="n">csv_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span><span class="s1">&#39;positivity&#39;</span><span class="p">,</span><span class="s1">&#39;negativity&#39;</span><span class="p">,</span><span class="s1">&#39;neutrality&#39;</span><span class="p">,</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span>
+<span class="n">csv_file</span><span class="o">=</span><span class="s2">&quot;file.csv&quot;</span>
+<span class="n">WriteDictToCSV</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span><span class="n">csv_columns</span><span class="p">,</span><span class="n">file_d</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1">#write in Word File</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="k">def</span> <span class="nf">WriteDictToCSV</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span><span class="n">csv_columns</span><span class="p">,</span><span class="n">dict_data</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">csv_columns</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dict_data</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+    <span class="k">return</span> 
+<span class="n">csv_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;word&quot;</span><span class="p">]</span>
+<span class="n">csv_file</span><span class="o">=</span><span class="s2">&quot;word_file.csv&quot;</span>
+<span class="n">WriteDictToCSV</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span><span class="n">csv_columns</span><span class="p">,</span><span class="n">word_file</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<ul>
+<li>Built Csv File containg comments,user details and likes</li>
+<li>Converted the Thai text into English Text using GoogleTrans module in python</li>
+<li>Calculated the polarity('Positivity','Negativity' and 'neutrality') of each comment</li>
+<li>Identified if the comment is positive,negative or neutral using the above polarities.</li>
+<li>Converted comments into word cloud and removed useless words.</li>
+<li>Used Tableau to give Visualizations.</li>
+</ul>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
