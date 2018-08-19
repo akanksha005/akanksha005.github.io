@@ -15,132 +15,621 @@
                 <h1><a href="/">Data Analytics-Akanksha Goel </a></h1>
                 <nav><ul>
                     <li><a href="/category/data-analysis.html">Data Analysis</a></li>
-                    <li><a href="/category/data-analytics.html">Data Analytics</a></li>
                     <li><a href="/category/data-visualization.html">Data Visualization</a></li>
                     <li><a href="/category/data-wrangling.html">Data Wrangling</a></li>
                     <li><a href="/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="/category/web-scraping.html">Web Scraping</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/hr-analytics.html">HR Analytics</a></h1>
+                    <h1 class="entry-title"><a href="/text-analytics-on-amazon-reviews.html">Text Analytics on Amazon Reviews</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2018-04-04T10:20:00+05:30">
-                Published: Wed 04 April 2018
+        <abbr class="published" title="2018-08-15T10:20:00+05:30">
+                Published: Wed 15 August 2018
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
         </address>
-<p>In <a href="/category/data-analytics.html">Data Analytics</a>.</p>
+<p>In <a href="/category/web-scraping.html">Web Scraping</a>.</p>
 
-</footer><!-- /.post-info --><h1>Overview on HR Analytics                                                          By-Akanksha Goel</h1>
-<p>After acquiring knowledge from different sources about analytics,It can be thought as dealing with customer facing problems.Analytics is usually considered by analyzing Big data provided by customers.But there are some internal operations of an organiation such as Human Resource Management that can be benfitted hugely by combining techniques of Analytics in it.</p>
-<p>Human Resources when converted to Data-Driven Human resources enable organizations to use collected employee data for better understanding of there workforce and improve overall performance of the company.</p>
-<p><strong>Human Resource analytics (HR analytics)</strong> is the systematic identification and quantification of the people drivers of business outcomes (Heuvel &amp; Bondarouk, 2016).HR analytics is about analyzing an organization's people problems. </p>
-<p>Let us see how Hr Analytics help in development of an organization.</p>
-<h2>Objectives of HR Analytics</h2>
-<p>Hr Analytics deals with-</p>
+</footer><!-- /.post-info --><div class="highlight"><pre><span></span>                                                                                                         By-Akanksha Goel
+</pre></div>
+
+
+<p>With a wide pool of unstructured Text Data coming from different sources like Social Media,Reviews and Feedbacks from various customers,written Documents converted into Text or Survey Reports,</p>
+<h3>Questions</h3>
+<ol>
+<li>How to get insights on customer perspective in this huge corpus of unstructured Data?</li>
+<li>How to understand different opinions from different customers and get common ground perspective?</li>
+<li>How to classify Text into diverse categories?</li>
+<li>How to generate Visuals that give clear picture from this unordered Data?</li>
+</ol>
+<p><strong>Text Analytics</strong> is the way!!!</p>
+<h2>What is Text Analytics?</h2>
+<p>The process of generating inferences and patterns from the pool of unstructured Data is refered to as Text Analytics.
+Text Analytics also termed as Text mining include various Natural Language Processing Techniques such as</p>
+<blockquote>
+<p>Text Summarisation,
+<br>
+ Text clustering,
+<br>
+Text classification,
+<br>
+Visualizations and 
+<br>
+Opinion mining or <strong>Sentiment Analysis</strong>,</p>
+</blockquote>
+<p>to understand meaning in this Huge dataset.</p>
+<h4>Sentiment Analysis is the major application of Text Analytics.</h4>
+<h2>Sentiment Analysis and its Application</h2>
+<h3>What is Sentiment Analysis?</h3>
+<p>Sentiment Analysis also refered to Opinion mining is the process of understanding whether piece of text is positive,negative or neutral and to what extent.Text can be in form of feedbacks,Reviews,Survey results,Tweets with different emoptions associated with them.
+Sentiment Analysis helps to identify overall View of masses on particular Brand or product.
+Polarity of opinion is associated with each word in a sentence.<br>
+For Example:</p>
+<table>
+<thead>
+<tr>
+<th>Text</th>
+<th>Positive Polarity Score</th>
+<th>Negative polarity Score</th>
+<th>Neutral polarity score</th>
+<th>Sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Akanksha is Good:</td>
+<td>0.9</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>Positive</td>
+</tr>
+<tr>
+<td>Akanksha is Bad:</td>
+<td>0.0</td>
+<td>0.9</td>
+<td>0.1</td>
+<td>Negative</td>
+</tr>
+</tbody>
+</table>
+<h3>Application of Sentiment Analysis</h3>
+<p>There are so many products in market having same configuration.<br>
+For Example:When buying mobile phones,there are so many choices and even the set of features are same.<br>
+<strong>How to know which one to buy?</strong><br></p>
+<h4>In this post Sentiment analysis is used on Amazon reviews of mobile to know which <strong>one</strong> is the best product.</h4>
+<h2>Implementation in Python</h2>
+<h4>Following 4 steps to do in depth analysis on different products and gives us the best product.</h4>
+<ol>
+<li>Loading the Dataset</li>
+<li>Preprocessing of the Dataset</li>
+<li>Sentiment Analysis.</li>
+<li>Data Visualisation.</li>
+</ol>
+<h3>Requirements</h3>
+<h4>Tool Requirements</h4>
+<ol>
+<li>
+<p>Download Anaconda(https://www.anaconda.com/downloads) <br>
+Or <br>
+Directly install Python 3(https://www.python.org/downloads/) </p>
+</li>
+<li>
+<p>Create Virtual Environment to use different versions of Python when required and use Conda to install Packages in Anaconda Prompt.
+(https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/) <br>
+Or<br>
+Python PIP library to install all packages in python (https://pip.pypa.io/en/stable/installing/) </p>
+</li>
+</ol>
+<h4>Package Requirements:</h4>
+<ol>
+<li>Install Python Requests package (http://docs.python-requests.org/en/master/user/install/) using command:</li>
+</ol>
+<blockquote>
+<p>Conda install Requests<br>
+    or <br>
+PIP install Requests</p>
+</blockquote>
+<p>Similarly,
+2. Install Python-Dateutil(https://pypi.org/project/python-dateutil/)
+3. Install Python LXML package (https://lxml.de/installation.html)
+4. Python Nltk package and Nltk data (https://www.nltk.org/data.html)
+5. Python Matplotlib Package (https://matplotlib.org/users/installing.html)
+6. Python Pandas Package (https://pandas.pydata.org/)
+7. Python Numpy Package 
+8. Python wordcloud Package</p>
+<div class="highlight"><pre><span></span><span class="c1">#Importing all the packages</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">html</span>  
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">dateutil</span> <span class="kn">import</span> <span class="n">parser</span> <span class="k">as</span> <span class="n">dateparser</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">sent_tokenize</span><span class="p">,</span> <span class="n">word_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.stem</span> <span class="kn">import</span> <span class="n">PorterStemmer</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.sentiment.vader</span> <span class="kn">import</span> <span class="n">SentimentIntensityAnalyzer</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span><span class="o">,</span><span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_output</span>
+<span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span><span class="p">,</span> <span class="n">STOPWORDS</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="kn">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Loading the Dataset</h3>
+<p>In this post I have scraped reviews of Mobiles from Amazon Website using <strong>requests</strong> and <strong>Lxml</strong> library of Python.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ParseReviews</span><span class="p">(</span><span class="n">asin</span><span class="p">,</span><span class="n">Number_of_Pages</span><span class="p">):</span>
+    <span class="n">ratings_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">reviews_list</span> <span class="o">=</span> <span class="p">[]</span> 
+
+    <span class="c1"># Number_of_Pages=4# You can iterate for as many number of Pages</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">Number_of_Pages</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">amazon_url</span><span class="o">=</span><span class="s1">&#39;https://www.amazon.in/product-reviews/&#39;</span><span class="o">+</span><span class="n">asin</span><span class="o">+</span><span class="s1">&#39;/ref=cm_cr_othr_d_paging_btm_+&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;+?pageNumber=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">amazon_url</span><span class="p">)</span>
+        <span class="n">page_response</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">page_response</span><span class="p">)</span>
+        <span class="n">XPATH_AGGREGATE</span> <span class="o">=</span> <span class="s1">&#39;//span[@id=&quot;acrCustomerReviewText&quot;]&#39;</span>
+        <span class="n">XPATH_REVIEW_SECTION_1</span> <span class="o">=</span> <span class="s1">&#39;//div[contains(@id,&quot;reviews-summary&quot;)]&#39;</span>
+        <span class="n">XPATH_REVIEW_SECTION_2</span> <span class="o">=</span> <span class="s1">&#39;//div[@data-hook=&quot;review&quot;]&#39;</span>
+
+        <span class="n">XPATH_AGGREGATE_RATING</span> <span class="o">=</span> <span class="s1">&#39;//table[@id=&quot;histogramTable&quot;]//tr&#39;</span>
+        <span class="n">XPATH_PRODUCT_NAME</span> <span class="o">=</span> <span class="s1">&#39;//h1//span[@id=&quot;productTitle&quot;]//text()&#39;</span>
+        <span class="n">XPATH_PRODUCT_PRICE</span>  <span class="o">=</span> <span class="s1">&#39;//span[@id=&quot;priceblock_ourprice&quot;]/text()&#39;</span>
+        <span class="n">raw_product_price</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_PRODUCT_PRICE</span><span class="p">)</span>
+        <span class="n">product_price</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">raw_product_price</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">raw_product_name</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_PRODUCT_NAME</span><span class="p">)</span>
+
+        <span class="n">reviews</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_REVIEW_SECTION_1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">reviews</span><span class="p">:</span>
+            <span class="n">reviews</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_REVIEW_SECTION_2</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">reviews</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unable to find reviews in page&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Parsing individual reviews</span>
+        <span class="k">for</span> <span class="n">review</span> <span class="ow">in</span> <span class="n">reviews</span><span class="p">:</span>
+            <span class="n">XPATH_REVIEW_TEXT_1</span> <span class="o">=</span> <span class="s1">&#39;.//div//span[@data-hook=&quot;review-body&quot;]//text()&#39;</span>
+            <span class="n">XPATH_REVIEW_TEXT_2</span> <span class="o">=</span> <span class="s1">&#39;.//div//span[@data-action=&quot;columnbalancing-showfullreview&quot;]/@data-columnbalancing-showfullreview&#39;</span>
+            <span class="n">XPATH_REVIEW_TEXT_3</span>  <span class="o">=</span> <span class="s1">&#39;.//div[contains(@id,&quot;dpReviews&quot;)]/div/text()&#39;</span>
+
+            <span class="n">raw_review_text1</span> <span class="o">=</span> <span class="n">review</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_REVIEW_TEXT_1</span><span class="p">)</span>
+            <span class="n">raw_review_text2</span> <span class="o">=</span> <span class="n">review</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_REVIEW_TEXT_2</span><span class="p">)</span>
+            <span class="n">raw_review_text3</span> <span class="o">=</span> <span class="n">review</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">XPATH_REVIEW_TEXT_3</span><span class="p">)</span>
+            <span class="n">review_text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">raw_review_text1</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">raw_review_text2</span><span class="p">:</span>
+                <span class="n">json_loaded_review_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw_review_text2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">json_loaded_review_data_text</span> <span class="o">=</span> <span class="n">json_loaded_review_data</span><span class="p">[</span><span class="s1">&#39;rest&#39;</span><span class="p">]</span>
+                <span class="n">cleaned_json_loaded_review_data_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&lt;.*?&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">json_loaded_review_data_text</span><span class="p">)</span>
+                <span class="n">full_review_text</span> <span class="o">=</span> <span class="n">review_text</span><span class="o">+</span><span class="n">cleaned_json_loaded_review_data_text</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">full_review_text</span> <span class="o">=</span> <span class="n">review_text</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">raw_review_text1</span><span class="p">:</span>
+                <span class="n">full_review_text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">raw_review_text3</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+
+            <span class="n">review_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;review_text&#39;</span><span class="p">:</span><span class="n">full_review_text</span><span class="p">,}</span>
+            <span class="n">reviews_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">review_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">reviews_list</span>
+
+<span class="k">def</span> <span class="nf">ReadAsin</span><span class="p">(</span><span class="n">pages</span><span class="p">,</span><span class="n">Asin_List</span><span class="p">):</span>
+    <span class="n">Final_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">review_list</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Asin_List</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">asin</span> <span class="ow">in</span> <span class="n">Asin_List</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Processing Reviews for &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">pages</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Pages of Product of  Asin Number:&quot;</span><span class="o">+</span><span class="n">asin</span><span class="p">)</span>
+
+
+        <span class="n">Final_data</span><span class="o">=</span><span class="p">(</span><span class="n">ParseReviews</span><span class="p">(</span><span class="n">asin</span><span class="p">,</span><span class="n">pages</span><span class="p">))</span>
+        <span class="n">sample</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Final_data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+            <span class="c1"># review_list.append(asin)</span>
+            <span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">review_list</span>
+</pre></div>
+
+
+<p>Redmi Note 5 Pro (64GB) and Samsung Galaxy J8 (Blue, 64GB) are two mobile phones which have 
+same set of <a href="https://www.91mobiles.com/compare/Xiaomi/Redmi+Note+5+Pro.html">features</a><br> but how to know which mobile to buy?<br>
+Therefore Reviews of these phones are parsed from Amazon website for comparison.<br></p>
+<h3>Redmi Note 5 Pro (64GB) Vs Samsung Galaxy J8 (Blue, 64GB)</h3>
+<p>To compare these mobile phones,you need to find there <strong>Asin number</strong>.
+Asin number is a unique number which is given by Amazon to each product.
+<img src="asin.png"></p>
+<h3>Fetching list of Amazon reviews</h3>
+<div class="highlight"><pre><span></span><span class="c1">#Fix number of Pages you want</span>
+<span class="c1">#Number of Pages=round(Number_of_reviews/10)</span>
+<span class="c1">#Each page signifies 10 reviews</span>
+<span class="n">pages</span><span class="o">=</span><span class="mi">3</span> <span class="c1">#30 reviews</span>
+
+<span class="c1">#Add list of unique Asin Number to be compared</span>
+<span class="c1">#B07CJYMDNQ: Redmi Note 5 Pro (64GB) Vs B07DZZKBBL: Samsung Galaxy J8 (Blue, 64GB)</span>
+<span class="n">Asin_List</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;B07CJYMDNQ&#39;</span><span class="p">,</span><span class="s1">&#39;B07DZZKBBL&#39;</span><span class="p">]</span>
+<span class="n">Mobile_names</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;B07CJYMDNQ&#39;</span><span class="p">:</span> <span class="s1">&#39;Redmi Note 5 Pro (64GB)&#39;</span><span class="p">,</span><span class="s1">&#39;B07DZZKBBL&#39;</span><span class="p">:</span> <span class="s1">&#39;Samsung Galaxy J8 (Blue, 64GB)&#39;</span><span class="p">}</span>
+<span class="c1">#Gives list of reviews for Asin listed.</span>
+<span class="n">review_list</span><span class="o">=</span><span class="n">ReadAsin</span><span class="p">(</span><span class="n">pages</span><span class="p">,</span><span class="n">Asin_List</span><span class="p">)</span>
+<span class="c1"># print(review_list) #Shows list of reviews </span>
+<span class="n">dataset</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">review_list</span><span class="p">)</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Processing Reviews for 3 Pages of Product of  Asin Number:B07CJYMDNQ
+Processing Reviews for 3 Pages of Product of  Asin Number:B07DZZKBBL
+</pre></div>
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>B07CJYMDNQ</th>
+      <th>B07DZZKBBL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0     They are not giving any accessories but ...</td>
+      <td>0     Super camera having live focus and varie...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Preprocessing of the Dataset</h3>
+<p>In any text mining problem, text cleaning is the first step where we remove those words from the document which may not contribute to the information we want to extract. Text may contain a lot of undesirable characters like punctuation marks, stop words and digits which may not be helpful.There are some words which are same in sense.
+For example:'Friendly,Friendly,Friendlines' which are repeated therfore reduced them to single stem word 'friendli'.</p>
+<p>The following code is used to filter the text.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">filter_sentence</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">PorterStemmer</span><span class="p">()</span>
+    <span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
+
+    <span class="n">word_tokens</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> 
+    <span class="n">filtered_sentence</span> <span class="o">=</span> <span class="p">[</span><span class="n">ps</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_tokens</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">]</span> <span class="c1"># removing useless words</span>
+    <span class="n">sentence</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">filtered_sentence</span><span class="p">:</span>
+        <span class="n">sentence</span><span class="o">=</span><span class="n">sentence</span><span class="o">+</span><span class="n">word</span><span class="o">+</span><span class="s1">&#39; &#39;</span>
+    <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">sentence</span> <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()])</span>
+    <span class="k">return</span> <span class="n">s</span>
+<span class="k">print</span><span class="p">(</span><span class="n">filter_sentence</span><span class="p">(</span><span class="s1">&#39;Hey! There are 20 good @ people.&#39;</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">filter_sentence</span><span class="p">(</span><span class="s1">&#39;Friendly Friendly Friendliness&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>hey  there  good  peopl  
+friendli friendli friendli
+</pre></div>
+
+
+<h3>Sentiment Analysis  using python</h3>
+<p>This is extention from <a href="http://www.nltk.org/howto/sentiment.html">here</a>.<br>
+Here positive,negative and neutral score of each review is compared with the Average positive,negative and neutral polarity score respectively.<br>
+If positive polarity of sentence is greater than average positive polarity of the comlete set of reviews then sentence is reffered as positive.
+similarly checking for negativity and positivity.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Sentiment_Analysis</span><span class="p">(</span><span class="n">review_list</span><span class="p">,</span><span class="n">Asin_List</span><span class="p">):</span>
+    <span class="n">Dataset</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">asin</span> <span class="ow">in</span> <span class="n">Asin_List</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Processing Sentiments for: &quot;</span><span class="o">+</span><span class="n">Mobile_names</span><span class="p">[</span><span class="n">asin</span><span class="p">])</span>
+
+        <span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">total_p</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">total_n</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">total_neu</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">text</span><span class="o">=</span><span class="p">(</span><span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">sentence</span><span class="o">=</span><span class="n">filter_sentence</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="n">SentimentIntensityAnalyzer</span><span class="p">()</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">sid</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ss</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span>
+                    <span class="n">total_p</span><span class="o">=</span><span class="n">total_p</span><span class="o">+</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;neg&#39;</span><span class="p">:</span>
+                    <span class="n">total_n</span><span class="o">=</span><span class="n">total_n</span><span class="o">+</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;neu&#39;</span><span class="p">:</span>
+                    <span class="n">total_neu</span><span class="o">=</span><span class="n">total_neu</span><span class="o">+</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">Avg_p</span><span class="o">=</span><span class="n">total_p</span><span class="o">/</span><span class="n">count</span>
+        <span class="n">Avg_n</span><span class="o">=</span><span class="n">total_n</span><span class="o">/</span><span class="n">count</span>
+        <span class="n">Avg_neu</span><span class="o">=</span><span class="n">total_neu</span><span class="o">/</span><span class="n">count</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Average Positive Polarity:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">Avg_p</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span> <span class="c1">#Average positive polarity score</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Average Negative Polarity:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">Avg_n</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span> <span class="c1">#Average Negative Polarity</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Average Neutral Polarity:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">Avg_neu</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="c1">#Average Neutral Polarity</span>
+
+        <span class="c1">#Check polarity with the help of average polarity</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">text</span><span class="o">=</span><span class="p">(</span><span class="n">review_list</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">sentence</span><span class="o">=</span><span class="n">filter_sentence</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">line</span><span class="o">=</span><span class="p">{}</span>
+            <span class="n">line</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">text</span>
+            <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">sid</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ss</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span>
+                    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;positivity&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">&gt;</span><span class="n">Avg_p</span><span class="p">:</span>
+                        <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;positive&#39;</span><span class="c1">#Appending sentiment to each sentence</span>
+                <span class="k">elif</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;neg&#39;</span><span class="p">:</span>
+                    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;negativity&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">&gt;</span><span class="n">Avg_n</span><span class="p">:</span>
+                        <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;negative&#39;</span><span class="c1">#Appending sentiment to each sentence</span>
+                <span class="k">elif</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;neu&#39;</span><span class="p">:</span>
+                    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;neutrality&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">&gt;</span><span class="n">Avg_neu</span><span class="p">:</span>
+                        <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;neutral&#39;</span><span class="c1">#Appending sentiment to each sentence</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">line</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;neutral&#39;</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">sid</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+
+            <span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="n">Dataset</span>
+<span class="n">Dataset_After_Sentiment_Analysis</span><span class="o">=</span><span class="n">Sentiment_Analysis</span><span class="p">(</span><span class="n">review_list</span><span class="p">,</span><span class="n">Asin_List</span><span class="p">)</span>
+<span class="n">dataset</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Dataset_After_Sentiment_Analysis</span><span class="p">)</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Processing Sentiments for: Redmi Note 5 Pro (64GB)
+Average Positive Polarity:0.18
+Average Negative Polarity:0.12
+Average Neutral Polarity:0.69
+Processing Sentiments for: Samsung Galaxy J8 (Blue, 64GB)
+Average Positive Polarity:0.4
+Average Negative Polarity:0.02
+Average Neutral Polarity:0.58
+</pre></div>
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>B07CJYMDNQ</th>
+      <th>B07DZZKBBL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{'text': 'They are not giving any accessories ...</td>
+      <td>{'text': 'Super camera having live focus and v...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{'text': 'I ordered phone in gold color and Am...</td>
+      <td>{'text': 'I am using this phone from last 8 da...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>{'text': 'All the accessories we're not receiv...</td>
+      <td>{'text': 'It is in amazing condition, package ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>{'text': 'On flipkar this phone available in 1...</td>
+      <td>{'text': 'Mid range best mobile with all premi...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>{'text': 'I didn't got my accessories 3 in ada...</td>
+      <td>{'text': 'good phone', 'sentiment': 'positive'...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Text Visualizations</h2>
+<p>Visualizations helps us to give clear inferences which cannot be easily seen with naked eyes.
+And when the dataset is large then relations and comparisons cannot be seen.<br>
+In this post word Clouds are used to give an idea about the prominent words used by the customer.The more the frequency of the word,the bigger the size of word in the cloud.<br>
+Barchart is used to compare the number of positive,negative and neutral comments.
+Barchart is also used to compare the Average positive,negative and neutral polarities of each mobile phone.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Final_visuals</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span><span class="n">Asin_List</span><span class="p">):</span>
+    <span class="n">Final_list</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">Avg_final_list</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">asin</span> <span class="ow">in</span> <span class="n">Asin_List</span><span class="p">:</span>
+
+        <span class="n">k</span><span class="o">=</span><span class="p">{}</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;neu&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;neg&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_p&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_n&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_neu&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="n">total_p</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">total_n</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">total_neu</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">Total_text</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">])):</span>
+            <span class="n">text</span><span class="o">=</span><span class="p">(</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+            <span class="n">sentence</span><span class="o">=</span><span class="n">filter_sentence</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">Total_text</span><span class="o">=</span><span class="n">Total_text</span><span class="o">+</span><span class="n">sentence</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;positive&#39;</span><span class="p">):</span>
+                <span class="n">k</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1">#Number of positive comments</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;negative&#39;</span><span class="p">):</span>
+                <span class="n">k</span><span class="p">[</span><span class="s1">&#39;neg&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;neg&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1">#Number of negative comments</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;neutral&#39;</span><span class="p">):</span>
+                <span class="n">k</span><span class="p">[</span><span class="s1">&#39;neu&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;neu&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1">#Number of neutral comments</span>
+            <span class="n">total_p</span><span class="o">=</span><span class="n">total_p</span><span class="o">+</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;positivity&#39;</span><span class="p">]</span>
+            <span class="n">total_n</span><span class="o">=</span><span class="n">total_n</span><span class="o">+</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;negativity&#39;</span><span class="p">]</span>
+            <span class="n">total_neu</span><span class="o">=</span><span class="n">total_neu</span><span class="o">+</span><span class="n">Dataset</span><span class="p">[</span><span class="n">asin</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;neutrality&#39;</span><span class="p">]</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_p&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">total_p</span><span class="o">/</span><span class="n">count</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#Average positive polarity score</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_n&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">total_n</span><span class="o">/</span><span class="n">count</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#Average negative polarity score</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_neu&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">total_neu</span><span class="o">/</span><span class="n">count</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#Average neutral polarity score</span>
+        <span class="n">k</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">count</span> <span class="c1">#Total no of Reviews</span>
+        <span class="n">Final_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">],</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;neg&#39;</span><span class="p">],</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;neu&#39;</span><span class="p">]])</span>
+        <span class="n">Avg_final_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_p&#39;</span><span class="p">],</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_n&#39;</span><span class="p">],</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_neu&#39;</span><span class="p">]])</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">Mobile_names</span><span class="p">[</span><span class="n">asin</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Number of positive comments:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Number of negative comments:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;neg&#39;</span><span class="p">]))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Number of neutral comments:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;neu&#39;</span><span class="p">]))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Average positive polarity score:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_p&#39;</span><span class="p">]))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Average negative polarity score:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_n&#39;</span><span class="p">]))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Average neutral polarity score:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;Avg_neu&#39;</span><span class="p">]))</span>
+
+        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">18</span>              
+        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;savefig.dpi&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">100</span>             
+        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.subplot.bottom&#39;</span><span class="p">]</span><span class="o">=.</span><span class="mi">1</span> 
+        <span class="n">stopwords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">STOPWORDS</span><span class="p">)</span>
+        <span class="n">wordcloud</span> <span class="o">=</span> <span class="n">WordCloud</span><span class="p">(</span>
+                                  <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
+                                  <span class="n">stopwords</span><span class="o">=</span><span class="n">stopwords</span><span class="p">,</span>
+                                  <span class="n">max_words</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                  <span class="n">max_font_size</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> 
+                                  <span class="n">random_state</span><span class="o">=</span><span class="mi">38</span>
+                                 <span class="p">)</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">Total_text</span><span class="p">)</span>
+
+        <span class="c1"># print(wordcloud)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Word Cloud of product with Asin:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">asin</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">wordcloud</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">Mobile_names</span><span class="p">[</span><span class="n">asin</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Bar chart showing number of reviews for each product&#39;</span><span class="p">)</span>
+    <span class="c1">#Bar Plot comparing number of Positive,Negative and Neutral reviews</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Positive&#39;</span><span class="p">,</span> <span class="s1">&#39;Negative&#39;</span><span class="p">,</span> <span class="s1">&#39;Neutral&#39;</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">bar_width</span><span class="o">=</span><span class="mf">0.35</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">Final_list</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">index</span><span class="o">+</span><span class="n">width</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">bar_width</span><span class="p">,</span><span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">Asin_List</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="o">+</span><span class="n">bar_width</span>
+        <span class="n">j</span> <span class="o">+=</span><span class="mi">1</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number of reviews&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1">#Bar Plot comparing Average polarities</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Barchart showing Average polarity score of each product&#39;</span><span class="p">)</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Positivity&#39;</span><span class="p">,</span> <span class="s1">&#39;Negativity&#39;</span><span class="p">,</span> <span class="s1">&#39;Neutrality&#39;</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">bar_width</span><span class="o">=</span><span class="mf">0.35</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">Avg_final_list</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">index</span><span class="o">+</span><span class="n">width</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">bar_width</span><span class="p">,</span><span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">Asin_List</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="o">+</span><span class="n">bar_width</span>
+        <span class="n">j</span> <span class="o">+=</span><span class="mi">1</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Average polarity score&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">Final_visuals</span><span class="p">(</span><span class="n">Dataset_After_Sentiment_Analysis</span><span class="p">,</span><span class="n">Asin_List</span><span class="p">)</span>     
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Redmi Note 5 Pro (64GB)-
+Number of positive comments:11
+Number of negative comments:4
+Number of neutral comments:15
+Average positive polarity score:0.18
+Average negative polarity score:0.12
+Average neutral polarity score:0.69
+Word Cloud of product with Asin:B07CJYMDNQ
+</pre></div>
+
+
+<p><img alt="png" src="output_17_1.png"></p>
+<div class="highlight"><pre><span></span>Samsung Galaxy J8 (Blue, 64GB)-
+Number of positive comments:13
+Number of negative comments:2
+Number of neutral comments:15
+Average positive polarity score:0.4
+Average negative polarity score:0.02
+Average neutral polarity score:0.58
+Word Cloud of product with Asin:B07DZZKBBL
+</pre></div>
+
+
+<p><img alt="png" src="output_17_3.png"></p>
+<div class="highlight"><pre><span></span>Bar chart showing number of reviews for each product
+</pre></div>
+
+
+<p><img alt="png" src="output_17_5.png"></p>
+<div class="highlight"><pre><span></span>Barchart showing Average polarity score of each product
+</pre></div>
+
+
+<p><img alt="png" src="output_17_7.png"></p>
+<h2>Conclusion</h2>
 <ul>
-<li>Making better decisions for increasing employee satisfaction and retention rates.</li>
-<li>Knowing about the best employees that are asset to the organization that would help taking actions to retain them for better revenue of the company.Identification of high value employees at the risk of leaving. </li>
-<li>Examining which factors were correlated with success in the job enabling the company to hire productive workforce   therefore improving recruitment process.</li>
-<li>Assessing the key performance Indicators(KPIs) for measurement of performance Management.</li>
-<li>Assessment of Recruitment channels that deal with identifying from where the major workForce comes from.</li>
-<li>Identification of Employees who require further training for the betterment of the organization.</li>
-<li>Testing the effectiveness of HR policies and different interventions.</li>
+<li>It can be seen that for Samsung mobile more positive words like 'Good','nice','awesom','best' are more frequent rather than in Redmi mobile</li>
+<li>Samsung has more number of positive comments compared to Redmi.</li>
+<li>Samsung has less number of negative comments compared to Redmi.</li>
 </ul>
-<h2>Questions dealt with Analytics</h2>
-<ul>
-<li>What are the factors affecting employee satisfaction and productivity?</li>
-<li>Who are the employees that are asset to the organization?</li>
-<li>What are the attributes of productive employees?and How attributes are correlated?For Example How working hours are related to productivity of Employees.</li>
-<li>Which employee require effective training?</li>
-<li>What is the employee turnover of different branches of the organization?What are the factors affecting turnover of the organization?What is regrettable churn?</li>
-</ul>
-<h2>Data Acquisition</h2>
-<p>After acquiring the questions,the nest step is to get Data.Data can be acquired from organization system comprising employee data, pay information, engagement scores etc. Things like performance reviews and email content can contain interesting information for analysis.</p>
-<p>Data from email activity is constantly being updated, so any changes in working patterns will show up very quickly. Because they show actual activity, these data are likely to be more accurate than opinion surveys, and offer a genuine way to identify and resolve a major problem.</p>
-<p>Social Media data is rapidly changing and updated source of information about employees and hiring managers.
-Social platform such as glassdoor.com can provide reviews of employees that can be analysed for understanding the employee satisfaction.</p>
-<h2>Aspects of HR Analytics</h2>
-<p>Given by <strong>Bernard Marr</strong> different Aspects of Analytics that must be understood to solve people's problem:-</p>
-<h3>Competency acquisition analytics</h3>
-<p>The success of your business depends on the level of expertise and skill of the workforce.Capability Analytics identifies the core competencies that is required by the company and therefore finding gaps in current level of capabilities within the business.</p>
-<h3>Capacity analytics</h3>
-<p>Capacity analytics deals with how operationally efficient people are in a business.It also allows businesses to understand  how much capacity they have to grow?</p>
-<h3>Employee churn analytics</h3>
-<p>Employee churn analytics is the process of assessing your staff turnover rates in an attempt to predict the future and reduce employee churn. Historical employee churn can be identified through traditional KPIs such as the employee satisfaction index, employee engagement level and staff advocacy score.Some employee churn can be desirable.It is important to develop system to stop the regrettable churn.</p>
-<h3>Corporate culture Analytics</h3>
-<p>Corporate culture analytics is the process of understanding more about corporate culture or the different cultures that exists across your organization.This ensure recruitment of people that don’t clash with the corporate culture.</p>
-<h3>Recruitment channel analytics</h3>
-<p>Recruitment channel analytics is the process of working out where best employees come from and what recruitment channels are most effective.</p>
-<h3>Employee performance analytics</h3>
-<p>Employee performance analytics seeks to assess individual employee performance. The resulting insights can identify who is performing well and who may need some additional training or support in order to raise their game.</p>
-<h2>Predictive Analytics for HR Analytics</h2>
-<p>Predictive analytics involve a set of various statistical (data mining) techniques used to predict uncertain outcomes.
-HR possesses a massive amount of people data. By applying predictive analysis to this data, HR relies on data-driven predictive models, instead of relying on gut feeling and soft science. HR predictive analytics enable HR to forecast the impact of people policies on the well-being, happiness and bottom line performance of employees.</p>
-<h4>Application of Predictive Analytics in HR Management</h4>
-<ul>
-<li>Company estimates the probability of people leaving the company by applying HR predictive analysis. </li>
-<li>Using Predictive Analytics,it is possible to predict someone’s personality and future work performance based on their Facebook profile.</li>
-</ul>
-<h2>Natural Language Processing in HR Analytics</h2>
-<p>Natural Language Processing can be used to analyze performance reviews to create employee competency profiles or automatically generate performance scores for both employees and managers.</p>
-<p>Sentiment analysis in email traffic.NLP can be used to predict employee’s engagement and attitudes in different groups by scanning email data.</p>
-<p>Resume classification and scoring using NLP can be of great help at the time of recruitment process.
-Surveys and feedback analysis is another application of NLP in HR perspective.</p>
-<h2>Business Intelligence Tools for HR Analytics</h2>
-<p>Business intelligence (BI) tools help in giving inferences and correlations between different attributes in HR Data.
-BI tools are used for-
-<em> Aggregating Data
-</em> Visualizing Data
-<em> Analyze Data
-</em> Report Data</p>
-<p>Some of the basic BI tools in HR are Qlik, Visier, Tableau, and Power BI.</p>
-<h2>Resources</h2>
-<ul>
-<li>https://blogs.sas.com/content/hiddeninsights/2017/06/20/analytics-improving-hr/</li>
-<li>https://www.forbes.com/sites/bernardmarr/2016/03/01/the-8-hr-analytics-every-manager-should-know-about/#102c1329788f</li>
-<li>https://www.analyticsinhr.com/blog/what-is-hr-analytics/</li>
-<li>https://www-01.ibm.com/software/analytics/solutions/operational-analytics/hr-analytics/index.html</li>
-<li>https://www.sweetspot.com/en/2013/03/27/what-exactly-are-kpis-and-what-models-can-we-use-to-choose-them/</li>
-<li>https://www.analyticsinhr.com/blog/natural-language-processing-revolutionize-human-resources/</li>
-</ul>                </article>
+<p><strong>Therefore Samsung is better than Redmi</strong></p>
+<h2>References</h2>
+<ol>
+<li>http://www.nltk.org/howto/sentiment.html</li>
+<li>https://matplotlib.org/api/index.html</li>
+<li>https://www.amazon.in/product-reviews/B07CJYMDNQ/ref=cm_cr_arp_d_paging_btm_3?pageNumber=1</li>
+<li>https://www.amazon.in/product-reviews/B07DZZKBBL/ref=cm_cr_othr_d_paging_btm_1?pageNumber=1</li>
+<li>https://www.scrapehero.com/how-to-scrape-amazon-product-reviews/</li>
+<li>https://akanksha005.github.io/category/data-visualization.html</li>
+</ol>                </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
                     <h1>Other articles</h1>
                     <hr />
                     <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/youtube-video-comments-analysis.html" rel="bookmark"
-                           title="Permalink to Youtube video comments Analysis">Youtube video comments Analysis</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2018-02-16T10:20:00+05:30">
-                Published: Fri 16 February 2018
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/akanksha-goel.html">Akanksha Goel</a>
-        </address>
-<p>In <a href="/category/data-visualization.html">Data Visualization</a>.</p>
-
-</footer><!-- /.post-info -->                <h1>Analysing Youtube Video comments(Assignment) By-Akanksha Goel</h1>
-<h2>Dataset</h2>
-<p>Comments of video ----&gt;https://www.youtube.com/watch?v=6ht4W7ZRd6Q</p>
-<p>Dataset --&gt;https://drive.google.com/file/d/17994Z3mCYci2HxDxzqhPAiquNB98YvLk/view?usp=sharing</p>
-<h2>Visualizations using Dataset created</h2>
-<p>Word Cloud ----&gt; https://public.tableau.com/profile/akanksha005#!/vizhome/Word_cloud/Sheet1?publish=yes</p>
-<p>Comments_Analysis -----&gt; https://public.tableau …</p>
-                <a class="readmore" href="/youtube-video-comments-analysis.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
 
             <li><article class="hentry">
                 <header>
